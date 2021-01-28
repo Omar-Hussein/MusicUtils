@@ -1,0 +1,21 @@
+{
+  "audioFilesRules": [
+    { "extention": "au",     "mimeType": "audio/basic"            },
+    { "extention": "snd",    "mimeType": "audio/basic"            },
+    { "extention": "pcm",    "mimeType": "auido/L24"              },
+    { "extention": "mid",    "mimeType": "audio/mid"              },
+    { "extention": "rmi",    "mimeType": "audio/mid"              },
+    { "extention": "mp3",    "mimeType": "audio/mpeg"             },
+    { "extention": "mp4",    "mimeType": "audio/mp4"              },
+    { "extention": "aif",    "mimeType": "audio/x-aiff"           },
+    { "extention": "aifc",   "mimeType": "audio/x-aiff"           },
+    { "extention": "aiff",   "mimeType": "audio/x-aiff"           },
+    { "extention": "m3u",    "mimeType": "audio/x-mpegurl"        },
+    { "extention": "ra",     "mimeType": "audio/vnd.rn-realaudio" },
+    { "extention": "ram",    "mimeType": "audio/vnd.rn-realaudio" },
+    { "extention": "ogg",    "mimeType": "audio/ogg"              },
+    { "extention": "vorbis", "mimeType": "audio/vorbis"           },
+    { "extention": "wav",    "mimeType": "audio/vnd.wav"          },
+    { "extention": "flac",   "mimeType": "audio/flac"             }
+  ]
+}

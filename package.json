@@ -1,0 +1,16 @@
+{
+  "name": "music-modifier",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Omar Hussein",
+  "license": "ISC",
+  "dependencies": {
+    "delete-empty": "^2.0.0",
+    "music-metadata": "^2.8.0",
+    "node-id3": "^0.1.6"
+  }
+}
