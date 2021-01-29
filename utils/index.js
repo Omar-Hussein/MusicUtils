@@ -7,4 +7,5 @@ module.exports = {
   removeAllEmptyFolders: require("./removeAllEmptyFolders"),
   getCertainFiles: require("./getCertainFiles"),
   startDialog: require("./startDialog"),
+  checkEnum: require("./checkEnum"),
 }
