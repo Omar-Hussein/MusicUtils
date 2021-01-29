@@ -8,4 +8,6 @@ module.exports = {
   getCertainFiles: require("./getCertainFiles"),
   startDialog: require("./startDialog"),
   checkEnum: require("./checkEnum"),
+  logObject: require("./logObject"),
+  removeQueryFromLink: require("./removeQueryFromLink"),
 }
