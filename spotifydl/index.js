@@ -1,6 +1,7 @@
 const { exec } = require("child_process")
 const { musicRootFolder } = require("../global")
 const { startDialog } = require("../utils")
+const logObject = require("../utils/logObject")
 const Spotify = require("./lib/Spotify")
 
 function spotifydl() {
@@ -9,9 +10,8 @@ function spotifydl() {
     const inputURL = data.toString().trim()
     if (!inputURL.match(/open.spotify.com/)) return
     const spotify = new Spotify()
-    const track = await spotify.getMusic(inputURL)
-    // console.log(track)
-    // spotify.getTrack
+    const urlMusicData = await spotify.getMusic(inputURL)
+    logObject(urlMusicData)
 
     // console.log("\n  Downloading...")
     // exec(`spotifydl ${answer} -o ${musicRootFolder}`, (error, stdout, stderr) => {

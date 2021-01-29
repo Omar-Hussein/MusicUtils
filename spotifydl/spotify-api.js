@@ -1,5 +1,5 @@
 const SpotifyWebApi = require("spotify-web-api-node")
-const mapMetaData = require("./utils/mapMetaData")
+const mapMetaData = require("./utils/metadata/mapMetaData")
 
 var spotifyApi = new SpotifyWebApi({
   clientId: "acc6302297e040aeb6e4ac1fbdfd62c3",
@@ -24,96 +24,25 @@ module.exports = {
   },
 
   async extractTrack(trackId) {
-    console.log("========================================= track =========================================")
     const trackData = await spotifyApi.getTrack(trackId)
-    mapMetaData(trackData)
-
-    return spotifyApi.getTrack(trackId).then(function (data) {
-      var details = {
-        name: "",
-        artists: [],
-        album_name: "",
-        release_date: "",
-        cover_url: "",
-      }
-      details.name = data.body.name
-      data.body.artists.forEach(artist => {
-        details.artists.push(artist.name)
-      })
-      details.album_name = data.body.album.name
-      details.release_date = data.body.album.release_date
-      details.cover_url = data.body.album.images[0].url
-      return details
-    })
-  },
-  // I have no idea why limit is not working
-  async extractPlaylist(playlistId) {
-    console.log("========================================= playlist =========================================")
-    const playListData = await spotifyApi.getPlaylist(playlistId, { limit: 100 })
-    mapMetaData(playListData)
-
-    return spotifyApi.getPlaylist(playlistId, { limit: 100 }).then(async function (data) {
-      var details = {
-        name: "",
-        total_tracks: 0,
-        tracks: [],
-      }
-      details.name = data.body.name + " - " + data.body.owner.display_name
-      details.total_tracks = data.body.tracks.total
-      if (data.body.tracks.next) {
-        let offset = 0
-        while (details.tracks.length < details.total_tracks) {
-          const playlistTracks = await spotifyApi.getPlaylistTracks(playlistId, { limit: 100, offset: offset })
-          try {
-            playlistTracks.body.items.forEach(item => {
-              details.tracks.push(item.track.id)
-            })
-          } catch (err) {
-            playlistTracks.body.tracks.items.forEach(item => {
-              details.tracks.push(item.track.id)
-            })
-            console.log(details.tracks.length)
-          }
-          offset += 100
-        }
-      } else {
-        data.body.tracks.items.forEach(item => {
-          details.tracks.push(item.track.id)
-        })
-      }
-      return details
-    })
+    return mapMetaData(trackData)
   },
 
-  async extractAlbum(albumId) {
-    console.log("========================================= album =========================================")
-    const albumData = await spotifyApi.getAlbum(albumId, { limit: 100 })
-    mapMetaData(albumData)
+  async extractPlaylist(playlistId, extractedTracks = []) {
+    const playlistData = await spotifyApi.getPlaylist(playlistId)
+    const playlistTracks = await spotifyApi.getPlaylistTracks(playlistId, { offset: extractedTracks.length, limit: 50 })
+    extractedTracks = [...extractedTracks, ...playlistTracks.body.items.map(item => item.track)]
+    if (playlistTracks.body.next) return this.extractPlaylist(playlistId, extractedTracks)
 
-    return spotifyApi.getAlbum(albumId, { limit: 100 }).then(async function (data) {
-      var details = {
-        name: "",
-        total_tracks: 0,
-        tracks: [],
-      }
-      details.name = data.body.name + " - " + data.body.label
-      details.total_tracks = data.body.tracks.total
-      if (data.body.tracks.next) {
-        let offset = 0
-        while (details.tracks.length < data.body.tracks.total) {
-          const albumTracks = await spotifyApi.getAlbumTracks(albumId, { limit: 100, offset: offset })
-          albumTracks.body.items.forEach(item => {
-            details.tracks.push(item.id)
-          })
-          offset += 100
-        }
-      } else {
-        data.body.tracks.items.forEach(item => {
-          details.tracks.push(item.id)
-        })
-      }
+    return mapMetaData(playlistData, extractedTracks)
+  },
 
-      return details
-    })
+  async extractAlbum(albumId, extractedTracks = []) {
+    const albumData = await spotifyApi.getAlbum(albumId)
+    const albumTracks = await spotifyApi.getAlbumTracks(albumId, { offset: extractedTracks.length, limit: 50 })
+    extractedTracks = [...extractedTracks, ...albumTracks.body.items]
+    if (albumTracks.body.next) return this.extractAlbum(albumId, extractedTracks)
+
+    return mapMetaData(albumData, extractedTracks)
   },
 }
