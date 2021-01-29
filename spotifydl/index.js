@@ -1,23 +1,28 @@
-const { renameSync, unlinkSync } = require("fs")
 const { exec } = require("child_process")
 const { musicRootFolder } = require("../global")
 const { startDialog } = require("../utils")
+const Spotify = require("./lib/Spotify")
 
 function spotifydl() {
   startDialog({ question: `Enter Spotify link you want to download.` })
-  process.stdin.on("data", data => {
-    const answer = data.toString().trim()
-    if (!answer.match(/open.spotify.com/)) return
-    console.log("\n  Downloading...")
-    exec(`spotifydl ${answer} -o ${musicRootFolder}`, (error, stdout, stderr) => {
-      if (error) return console.log("error", error)
+  process.stdin.on("data", async data => {
+    const inputURL = data.toString().trim()
+    if (!inputURL.match(/open.spotify.com/)) return
+    const spotify = new Spotify()
+    const track = await spotify.getMusic(inputURL)
+    // console.log(track)
+    // spotify.getTrack
 
-      console.log(stderr)
-      console.log("Downloaded successfully!")
-      console.log("Moving to root folder...")
-      console.log("Moved to root folder!")
-      require("../rearrange")()
-    })
+    // console.log("\n  Downloading...")
+    // exec(`spotifydl ${answer} -o ${musicRootFolder}`, (error, stdout, stderr) => {
+    //   if (error) return console.log("error", error)
+
+    //   console.log(stderr)
+    //   console.log("Downloaded successfully!")
+    //   console.log("Moving to root folder...")
+    //   console.log("Moved to root folder!")
+    //   require("../rearrange")()
+    // })
   })
 }
 

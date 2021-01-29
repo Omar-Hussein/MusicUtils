@@ -11,6 +11,7 @@
   "dependencies": {
     "delete-empty": "^2.0.0",
     "music-metadata": "^2.8.0",
-    "node-id3": "^0.1.6"
+    "node-id3": "^0.1.6",
+    "spotify-web-api-node": "^5.0.2"
   }
 }
