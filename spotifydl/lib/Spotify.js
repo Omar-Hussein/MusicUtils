@@ -1,4 +1,4 @@
-const spotifyApi = require("../spotify-api")
+const spotifyApi = require("../spotifyApi")
 const getURLType = require("../utils/getURLType")
 
 class Spotify {
