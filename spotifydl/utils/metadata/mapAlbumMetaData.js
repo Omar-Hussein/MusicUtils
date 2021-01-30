@@ -3,9 +3,12 @@ const sanitizeAlbum = require("./sanitizeAlbum")
 
 function mapAlbumMetaData(albumBody, tracks) {
   return {
-    label: albumBody.label,
-    ...sanitizeAlbum(albumBody),
-    tracks: tracks.map(track => mapTrackMetaData(track, tracks, albumBody.album_type)),
+    total_tracks: albumBody.total_tracks,
+    tracks: tracks.map(track => ({
+      label: albumBody.label,
+      ...sanitizeAlbum(albumBody),
+      ...mapTrackMetaData(track, tracks, albumBody.album_type),
+    })),
   }
 }
 

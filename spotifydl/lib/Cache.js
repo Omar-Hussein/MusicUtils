@@ -1,20 +1,29 @@
 const { existsSync, writeFileSync, unlinkSync, mkdirSync, readFileSync } = require("fs")
 
 class Cache {
-  write(dir, counter) {
-    if (existsSync(dir)) unlinkSync(dir)
-    writeFileSync(dir, String(counter))
+  constructor(dir) {
+    this.filename = ".cache"
+    this.dir = dir
+    this.file = `${this.dir}\\${this.filename}`
   }
 
-  read(dir) {
-    dir = `${dir}\\.cache`
-
-    if (!existsSync(dir)) {
-      mkdirSync(dir, { recursive: true })
+  read() {
+    if (!existsSync(this.dir)) {
+      mkdirSync(this.dir, { recursive: true })
       return 0
     } else {
-      return Number(readFileSync(dir, "utf-8"))
+      if (existsSync(this.file)) return Number(readFileSync(this.file, "utf-8"))
+      return 0
     }
+  }
+
+  write(counter) {
+    if (existsSync(this.file)) this.remove()
+    writeFileSync(this.file, String(counter))
+  }
+
+  remove() {
+    unlinkSync(this.file)
   }
 }
 

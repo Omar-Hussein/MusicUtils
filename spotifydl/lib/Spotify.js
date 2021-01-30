@@ -21,7 +21,6 @@ class Spotify {
 
   async getMusicData() {
     const id = await this.getID(this.url)
-    if (this.urlType === "Artist") throw new Error("Can't download an artist, yet!")
     this.musicData = await spotifyApi[`extract${this.urlType}`](id)
   }
 
@@ -38,23 +37,38 @@ class Spotify {
     await metadata.merge()
   }
 
-  async downloadPlaylist(rootOutputDir) {
-    const outputDir = `${rootOutputDir}\\${optimizeFileName(this.musicData.playlist)}`
-    for (const track of this.musicData.tracks.entries()) {
-      await this.downloadTrack(outputDir, track)
+  async downloadAlbumAndPlaylist(rootOutputDir) {
+    const outputDir = `${rootOutputDir}\\${optimizeFileName(
+      this.urlType === "Album"
+        ? `${this.musicData.tracks[0].album_artist} - ${this.musicData.tracks[0].album}`
+        : this.musicData.playlist
+    )}`
+
+    const cache = new Cache(outputDir)
+    let cacheCounter = cache.read()
+    const totalTracks = this.musicData.total_tracks
+
+    for (let i = cacheCounter; i < totalTracks; i++) {
+      await this.downloadTrack(outputDir, this.musicData.tracks[i])
+      cache.write(++cacheCounter)
     }
   }
 
-  async downloadAlbum() {
-    console.log("\n\n  THAT'S AN ALBUM; NOT SET YET.")
-  }
   async download(outputDir) {
-    await this.getMusicData()
+    if (this.urlType.match(/Track|Playlist|Album/)) await this.getMusicData()
+    try {
+      // Download single tracks
+      if (this.urlType === "Track") await this.downloadTrack(outputDir)
+      else if (this.urlType.match(/Album|Playlist/)) await this.downloadAlbumAndPlaylist(outputDir)
+      else if (this.urlType === "Artist")
+        throw new Error("To download an artist add their work to playlist and download it.")
+      else throw new Error("Invalid URL type")
 
-    // Download single tracks
-    if (this.urlType === "Track") await this.downloadTrack(outputDir)
-    else if (this.urlType === "Playlist") await this.downloadPlaylist(outputDir)
-    else if (this.urlType === "Album") await this.downloadAlbum()
+      console.log("finished!")
+    } catch (e) {
+      console.log(`\n  ${e.message}\n`)
+      process.exit()
+    }
   }
 }
 module.exports = Spotify

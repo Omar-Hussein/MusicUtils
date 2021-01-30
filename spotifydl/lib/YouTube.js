@@ -4,17 +4,22 @@ const ffmpeg = require("fluent-ffmpeg")
 
 class YouTube {
   buildYTUrl(searchResult) {
-    return searchResult.url.match("https://youtube.com")
+    return searchResult.url.includes("https://youtube.com")
       ? searchResult.url
-      : `https://youtube.com/watch?v=${searchResult.videoId}`
+      : `https://youtube.com${searchResult.url}`
   }
 
   async getLink(query) {
     try {
       const result = await youtubeSearch(query)
       return this.buildYTUrl(result.videos[0])
-    } catch (error) {
-      return error
+    } catch (_) {
+      try {
+        const result = await youtubeSearch(query.replace(/-/, " "))
+        return this.buildYTUrl(result.videos[0])
+      } catch (error) {
+        return error
+      }
     }
   }
 

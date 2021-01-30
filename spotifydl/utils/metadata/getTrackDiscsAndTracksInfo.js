@@ -19,7 +19,7 @@ function getTrackDiscsAndTracksInfo(albumTracks, { trackNumber, discNumber }, al
   // Return the data
   return {
     ...sharedData,
-    tracks: tracksCountData[tracksCountData.length - 1].totalTracks,
+    tracks: tracksCountData.find(trackCountData => trackCountData.disc === sharedData.discNumber).totalTracks,
     discs: tracksCountData[tracksCountData.length - 1].disc,
   }
 }
