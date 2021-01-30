@@ -47,9 +47,11 @@ class Metadata {
     })
   }
 
-  async merge() {
+  async merge(spinner) {
+    spinner.start("Merging metadata...")
     await this.downloadCover()
     await this.write()
+    spinner.succeed("Merged metadata!")
   }
 }
 

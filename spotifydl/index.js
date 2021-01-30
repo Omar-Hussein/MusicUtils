@@ -3,15 +3,22 @@ const { musicRootFolder } = require("../global")
 const { startDialog, optimizeFileName } = require("../utils")
 const logObject = require("../utils/logObject")
 const Spotify = require("./lib/Spotify")
+const ora = require("ora")
 
 function spotifydl() {
   startDialog({ question: `Enter Spotify link you want to download.` })
   process.stdin.on("data", async data => {
+    console.log("\n")
     const inputURL = data.toString().trim()
     if (!inputURL.match(/open.spotify.com/)) return
-    const spotify = new Spotify(inputURL)
+
+    const spinner = ora("Searching...").start()
+
+    const spotify = new Spotify(inputURL, spinner)
+
     await spotify.download(musicRootFolder)
-    // require("../rearrange")()
+    await require("../rearrange")()
+    process.exit()
   })
 }
 

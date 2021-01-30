@@ -15,6 +15,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "music-metadata": "^2.8.0",
     "node-id3": "^0.1.6",
+    "ora": "^5.3.0",
     "spotify-web-api-node": "^5.0.2",
     "yt-search": "^2.5.2",
     "ytdl-core": "^4.4.5"

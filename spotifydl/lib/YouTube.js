@@ -23,19 +23,24 @@ class YouTube {
     }
   }
 
-  downloadAudio(query, output) {
+  downloadAudio(query, output, spinner) {
     return new Promise(async (resolve, reject) => {
+      spinner.start(`Downloading ${query}...`)
       const youtubeLink = await this.getLink(query)
       const download = ytdl(youtubeLink, { quality: "highestaudio" })
 
-      console.log("started...")
+      download.on("progress", (_, downloaded, total) => {
+        spinner.text = `Downloading ${(downloaded / 1024 / 1024).toFixed(2)}MB of ${(total / 1024 / 1024).toFixed(
+          2
+        )}MB\n`
+      })
 
       ffmpeg(download)
         .audioBitrate(256)
         .save(`${output}`)
         .format("mp3")
         .on("end", () => {
-          console.log("downloaded")
+          spinner.succeed(`Download ${query} successfully.`)
           resolve()
         })
     })
