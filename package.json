@@ -9,7 +9,9 @@
   "author": "Omar Hussein",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.21.1",
     "delete-empty": "^2.0.0",
+    "ffmetadata": "^1.6.0",
     "fluent-ffmpeg": "^2.1.2",
     "music-metadata": "^2.8.0",
     "node-id3": "^0.1.6",

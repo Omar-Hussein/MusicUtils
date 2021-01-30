@@ -1,5 +1,6 @@
 const spotifyApi = require("../spotifyApi")
 const YouTube = require("./YouTube")
+const Metadata = require("./Metadata")
 
 const { optimizeFileName } = require("../../utils")
 const getURLType = require("../utils/getURLType")
@@ -34,6 +35,9 @@ class Spotify {
 
       const youtube = new YouTube()
       await youtube.downloadAudio(songName, output)
+
+      const metadata = new Metadata(this.urlMusicData, output)
+      await metadata.merge()
     }
     process.exit()
   }
