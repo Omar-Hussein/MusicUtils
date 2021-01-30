@@ -1,7 +1,8 @@
 const mapTrackMetaData = require("./mapTrackMetaData")
 
-function mapPlaylistMetaData(_, tracks) {
+function mapPlaylistMetaData(playlistBody, tracks) {
   return {
+    playlist: playlistBody.name,
     tracks: tracks.map(track => mapTrackMetaData(track, tracks, "playlist")),
   }
 }

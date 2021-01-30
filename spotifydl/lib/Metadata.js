@@ -12,12 +12,16 @@ class Metadata {
 
   downloadCover() {
     return new Promise(async (resolve, reject) => {
-      const writer = createWriteStream(this.coverFileName)
-      const response = await axios.get(this.metadata.artwork_url, {
-        responseType: "stream",
-      })
-      response.data.pipe(writer)
-      writer.on("close", resolve)
+      try {
+        const writer = createWriteStream(this.coverFileName)
+        const response = await axios.get(this.metadata.artwork_url, {
+          responseType: "stream",
+        })
+        response.data.pipe(writer)
+        writer.on("close", resolve)
+      } catch (e) {
+        reject(e)
+      }
     })
   }
 
