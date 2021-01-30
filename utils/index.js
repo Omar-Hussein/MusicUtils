@@ -1,13 +1,7 @@
-module.exports = {
-  logBreak: require("./logBreak"),
-  getExtension: require("./getExtension"),
-  scanFiles: require("./scanFiles"),
-  mkDirByPathSync: require("./mkDirByPathSync"),
-  getFileCreationDate: require("./getFileCreationDate"),
-  removeAllEmptyFolders: require("./removeAllEmptyFolders"),
-  getCertainFiles: require("./getCertainFiles"),
-  startDialog: require("./startDialog"),
-  checkEnum: require("./checkEnum"),
-  logObject: require("./logObject"),
-  removeQueryFromLink: require("./removeQueryFromLink"),
-}
+const { readdirSync } = require("fs")
+
+const utils = readdirSync("./utils")
+  .filter(util => util !== "index.js")
+  .map(util => util.replace(/\.js$/, ""))
+
+module.exports = utils.reduce((acc, util) => ({ ...acc, [util]: require(`./${util}`) }), {})
