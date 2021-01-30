@@ -8,13 +8,14 @@ function mapTrackMetaData(
   albumType
 ) {
   const sharedData = {
-    name,
-    artists: sanitizeArtists(artists),
+    title: name,
+    artist: sanitizeArtists(artists),
+    "DISPLAY ARTIST": sanitizeArtists(artists),
   }
 
   const albumData = album && sanitizeAlbum(album)
 
-  const trackCountData = getTrackDiscsAndTracksInfo(
+  const { tracks, discs } = getTrackDiscsAndTracksInfo(
     albumTracks,
     { trackNumber, discNumber },
     albumType || album?.album_type
@@ -23,7 +24,8 @@ function mapTrackMetaData(
   return {
     ...sharedData,
     ...albumData,
-    ...trackCountData,
+    track: `${trackNumber}${tracks ? `/${tracks}` : ""}`,
+    disc: `${discNumber}${discs ? `/${discs}` : ""}`,
   }
 }
 module.exports = mapTrackMetaData

@@ -10,17 +10,8 @@ function spotifydl() {
     const inputURL = data.toString().trim()
     if (!inputURL.match(/open.spotify.com/)) return
     const spotify = new Spotify(inputURL)
-    spotify.download(musicRootFolder)
-
-    // console.log("\n  Downloading...")
-    // exec(`spotifydl ${answer} -o ${musicRootFolder}`, (error, stdout, stderr) => {
-    //   if (error) return console.log("error", error)
-    //   console.log(stderr)
-    //   console.log("Downloaded successfully!")
-    //   console.log("Moving to root folder...")
-    //   console.log("Moved to root folder!")
-    //   require("../rearrange")()
-    // })
+    await spotify.download(musicRootFolder)
+    // require("../rearrange")()
   })
 }
 

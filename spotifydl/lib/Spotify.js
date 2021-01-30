@@ -30,7 +30,7 @@ class Spotify {
 
     // Download single tracks
     if (this.urlType === "Track") {
-      const songName = `${this.urlMusicData.artists[0]} - ${this.urlMusicData.name}`
+      const songName = `${this.urlMusicData.album_artist} - ${this.urlMusicData.title}`
       const output = `${outputDir}\\${optimizeFileName(songName)}.mp3`
 
       const youtube = new YouTube()
@@ -39,7 +39,6 @@ class Spotify {
       const metadata = new Metadata(this.urlMusicData, output)
       await metadata.merge()
     }
-    process.exit()
   }
 }
 module.exports = Spotify
