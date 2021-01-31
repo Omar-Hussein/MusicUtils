@@ -1,19 +1,23 @@
 const { readdirSync, renameSync } = require("fs")
 const { musicRootFolder, audioFilesFormat } = require("../global")
-const { removeAllEmptyFolders, scanFiles, getCertainFiles, mkDirByPathSync } = require("../utils")
+const { startDialog, removeAllEmptyFolders, scanFiles, getCertainFiles, mkDirByPathSync } = require("../utils")
 const { backup, getCurrentProcessPercentage, removeNonAudioFiles, extractFileData, setDestFolder } = require("./utils")
 
 const ora = require("ora")
-const spinner = ora("Scanning files").start()
 
 async function rearrange() {
-  const allFiles = scanFiles(musicRootFolder)
+  const shouldBackup = await startDialog("Backup the files first?", { type: "confirm", defaultAnswer: false })
 
-  // backup(allFiles, spinner)
+  const spinner = ora("Scanning files").start()
+  const allFiles = scanFiles(musicRootFolder)
+  if (shouldBackup) backup(allFiles, spinner)
+
   removeNonAudioFiles(allFiles, spinner)
 
   let musicFiles = getCertainFiles(allFiles, audioFilesFormat)
 
+  spinner.stop()
+  console.log("")
   spinner.info(`Rearranging ${musicFiles.length} music files`)
   spinner.start("Rearranging the files...")
 
@@ -35,13 +39,14 @@ async function rearrange() {
       }
     }
   } catch (err) {
-    console.log(err)
+    console.log(err.message)
   }
 
   spinner.text = "Removing empty folders..."
   removeAllEmptyFolders(musicRootFolder) // Delete the empty folders
 
   spinner.succeed(`Rearranged ${musicRootFolder}`)
+  console.log("")
 }
 
 module.exports = rearrange

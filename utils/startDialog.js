@@ -1,16 +1,16 @@
 const inquirer = require("inquirer")
 
-async function startDialog(question, { defaultAnswer, options, validator }) {
+async function startDialog(question, { type, defaultAnswer, options, validator }) {
   const enterSpotifyLinkQuestion = {
-    type: options ? "list" : "input",
-    name: "question",
+    type: type || (options ? "list" : "input"),
+    name: "answer",
     message: question,
     choices: options,
     default: defaultAnswer,
     validate: validator,
   }
 
-  const { question: answer } = await inquirer.prompt([enterSpotifyLinkQuestion])
+  const { answer } = await inquirer.prompt([enterSpotifyLinkQuestion])
   return answer
 }
 
