@@ -1,20 +1,29 @@
-const fs = require("fs")
-const path = require("path")
 const mm = require("music-metadata")
 
-const { notFileNameFormat, musicRootFolder, backupFolder, audioFilesFormat } = require("../global")
-const { removeAllEmptyFolders, scanFiles, getExtension, getCertainFiles, mkDirByPathSync } = require("../utils")
+const { copyFileSync, unlinkSync, readdirSync, renameSync } = require("fs")
+const { resolve } = require("path")
+
+const { musicRootFolder, backupFolder, audioFilesFormat } = require("../global")
+
+const {
+  removeAllEmptyFolders,
+  scanFiles,
+  getExtension,
+  getCertainFiles,
+  mkDirByPathSync,
+  optimizeFileName,
+} = require("../utils")
 
 const allFiles = scanFiles(musicRootFolder)
 
 function backUpAllFiles() {
   allFiles.forEach((file, index, self) => {
     let fileRelativeToRoot = file.slice(musicRootFolder.length + 1, file.length)
-    let dest = path.resolve(backupFolder, fileRelativeToRoot)
+    let dest = resolve(backupFolder, fileRelativeToRoot)
     let destParentDir = dest.slice(0, dest.lastIndexOf(`\\`))
     mkDirByPathSync(`\\${destParentDir}`) // Create the folder if it doesn't exist
     process.stdout.write(`  ${getCurrentProcessPercentage(index, self.length)} %  Backing up the files...\r`)
-    fs.copyFileSync(file, dest)
+    copyFileSync(file, dest)
   })
   removeAllEmptyFolders(backupFolder)
 }
@@ -31,7 +40,7 @@ function removeNonAudioFiles() {
     .filter(file => !getExtension(file).match(audioFilesFormat))
     .forEach((file, index, self) => {
       process.stdout.write(`  ${getCurrentProcessPercentage(index, self.length)} %  Deleting none audio files...\r`)
-      fs.unlinkSync(file)
+      unlinkSync(file)
     })
 }
 
@@ -45,7 +54,7 @@ function getSongAlbumFolder(albumName, songComment) {
     { albumTypeRegexToSearch: /remix(es)?/i, albumFolderName: "Remixes" },
     { albumTypeRegexToSearch: /unreleased/i, albumFolderName: "Unreleased" },
     {
-      albumTypeRegexToSearch: /(compilations|(platinum)? ?collection|best of|essential|greatests? hits|the best|this is |mixtape)/i,
+      albumTypeRegexToSearch: /(compilations|(platinum)? ?collection|best of|essential|greatests? hits|the best|mixtape)/i,
       albumFolderName: "Compilations",
     },
     { albumTypeRegexToSearch: /( |-)?eps?/i, albumFolderName: "EPs" },
@@ -59,11 +68,6 @@ function getSongAlbumFolder(albumName, songComment) {
   )
   if (matchedTypeData) return matchedTypeData.albumFolderName
   else return "Albums"
-}
-
-function optimizeForFileName(nameToOptimize) {
-  if (nameToOptimize && nameToOptimize.match(notFileNameFormat)) return nameToOptimize.replace(notFileNameFormat, "_")
-  return nameToOptimize
 }
 
 function getDestFolder(currentDirForm, artist, album, year, disk, track, title, ext) {
@@ -99,9 +103,9 @@ async function rearrange() {
 
       let metadata = await mm.parseFile(file)
       let tags = metadata.common
-      let title = tags.title ? tags.title.trim() : tags.title
-      let artist = tags.albumartist ? tags.albumartist.trim() : tags.artist ? tags.artist.trim() : tags.artist
-      let album = tags.album ? tags.album.trim() : tags.album
+      let title = tags.title?.trim()
+      let artist = tags.albumartist?.trim()
+      let album = tags.album?.trim()
       let year = parseInt(tags.year)
       let comment = tags.comment
       let track = parseInt(tags.track.no) || 1
@@ -135,9 +139,9 @@ async function rearrange() {
       }
 
       // Optimizing the (artist, album and title) to be suitable fot a folder|file name
-      artist = optimizeForFileName(artist)
-      album = optimizeForFileName(album)
-      title = optimizeForFileName(title)
+      artist = optimizeFileName(artist)
+      album = optimizeFileName(album)
+      title = optimizeFileName(title)
 
       // If it's more than one artist
       if (artist.match(/\u0000/gi)) artist = artist.replace(/\u0000/gi, " & ")
@@ -150,9 +154,9 @@ async function rearrange() {
       // Checks first if the file already is in the right path
       if (file !== `${dest}\\${renameFileTo}`) {
         mkDirByPathSync(`\\${dest}`) // Create all the full path if it doesn't extist
-        let existingFile = fs.readdirSync(dest).filter(fileToCheck => fileToCheck === renameFileTo)
+        let existingFile = readdirSync(dest).filter(fileToCheck => fileToCheck === renameFileTo)
         if (existingFile.length > 0) renameFileTo = `${track}. ${title} - [${index}].${ext}`
-        fs.renameSync(file, `${dest}\\${renameFileTo}`) // Move the files to their folders
+        renameSync(file, `${dest}\\${renameFileTo}`) // Move the files to their folders
       }
       movedSuccessfully++
     }
