@@ -1,7 +1,4 @@
 function getTrackDiscsAndTracksInfo(albumTracks, { trackNumber, discNumber }, albumType) {
-  // Handle if single album
-  if (albumType === "single") return { trackNumber, discNumber, tracks: 1, discs: 1 }
-
   // Handle if track or playlist
   const sharedData = { trackNumber, discNumber }
   if (!albumTracks || albumType === "playlist") return sharedData
