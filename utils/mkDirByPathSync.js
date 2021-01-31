@@ -1,16 +1,15 @@
-const fs = require("fs")
-const path = require("path")
+const { mkdirSync } = require("fs")
+const { sep, isAbsolute, resolve } = require("path")
 
 function mkDirByPathSync(targetDir, { isRelativeToScript = false } = {}) {
-  const sep = path.sep
-  const initDir = path.isAbsolute(targetDir) ? sep : ""
+  const initDir = isAbsolute(targetDir) ? sep : ""
   const baseDir = isRelativeToScript ? __dirname : "."
 
   return targetDir.split(sep).reduce((parentDir, childDir) => {
-    const curDir = path.resolve(baseDir, parentDir, childDir)
+    const curDir = resolve(baseDir, parentDir, childDir)
 
     try {
-      fs.mkdirSync(curDir)
+      mkdirSync(curDir)
     } catch (err) {
       if (err.code === "EEXIST") return curDir
 
