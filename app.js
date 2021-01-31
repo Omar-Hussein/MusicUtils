@@ -1,10 +1,7 @@
 const { startDialog } = require("./utils")
 const APP_FUNCTIONS = [
-  {
-    functionDescription: "Rearrange the music files but will delete the ini and images files.",
-    functionPath: "./rearrange",
-  },
-  { functionDescription: "Download playlist/song from Spotify.", functionPath: "./spotifydl" },
+  { functionDescription: "Rearrange the music files.", functionPath: "./rearrange" },
+  { functionDescription: "Download via Spotify link.", functionPath: "./spotifydl" },
 ]
 
 main()
