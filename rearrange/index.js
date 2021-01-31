@@ -1,193 +1,47 @@
-const mm = require("music-metadata")
+const { readdirSync, renameSync } = require("fs")
+const { musicRootFolder, audioFilesFormat } = require("../global")
+const { removeAllEmptyFolders, scanFiles, getCertainFiles, mkDirByPathSync } = require("../utils")
+const { backup, getCurrentProcessPercentage, removeNonAudioFiles, extractFileData, setDestFolder } = require("./utils")
 
-const { copyFileSync, unlinkSync, readdirSync, renameSync } = require("fs")
-const { resolve } = require("path")
-
-const { musicRootFolder, backupFolder, audioFilesFormat } = require("../global")
-
-const {
-  removeAllEmptyFolders,
-  scanFiles,
-  getExtension,
-  getCertainFiles,
-  mkDirByPathSync,
-  optimizeFileName,
-} = require("../utils")
-
-const allFiles = scanFiles(musicRootFolder)
-
-function backUpAllFiles() {
-  allFiles.forEach((file, index, self) => {
-    let fileRelativeToRoot = file.slice(musicRootFolder.length + 1, file.length)
-    let dest = resolve(backupFolder, fileRelativeToRoot)
-    let destParentDir = dest.slice(0, dest.lastIndexOf(`\\`))
-    mkDirByPathSync(`\\${destParentDir}`) // Create the folder if it doesn't exist
-    process.stdout.write(`  ${getCurrentProcessPercentage(index, self.length)} %  Backing up the files...\r`)
-    copyFileSync(file, dest)
-  })
-  removeAllEmptyFolders(backupFolder)
-}
-function getMusicFile() {
-  return getCertainFiles(allFiles, audioFilesFormat)
-}
-
-function getCurrentProcessPercentage(index, arrayLength) {
-  return Math.ceil(((index + 1) / arrayLength) * 100)
-}
-
-function removeNonAudioFiles() {
-  allFiles
-    .filter(file => !getExtension(file).match(audioFilesFormat))
-    .forEach((file, index, self) => {
-      process.stdout.write(`  ${getCurrentProcessPercentage(index, self.length)} %  Deleting none audio files...\r`)
-      unlinkSync(file)
-    })
-}
-
-/* Song Utils */
-function getSongAlbumFolder(albumName, songComment) {
-  if (!albumName && !songComment) return "No Album"
-
-  const ALBUM_TYPES_DATA = [
-    { albumTypeRegexToSearch: /(live|itunes session)/i, albumFolderName: "Live" },
-    { albumTypeRegexToSearch: /demos?/i, albumFolderName: "Demos" },
-    { albumTypeRegexToSearch: /remix(es)?/i, albumFolderName: "Remixes" },
-    { albumTypeRegexToSearch: /unreleased/i, albumFolderName: "Unreleased" },
-    {
-      albumTypeRegexToSearch: /(compilations|(platinum)? ?collection|best of|essential|greatests? hits|the best|mixtape)/i,
-      albumFolderName: "Compilations",
-    },
-    { albumTypeRegexToSearch: /( |-)?eps?/i, albumFolderName: "EPs" },
-    { albumTypeRegexToSearch: /sing(le|el)/i, albumFolderName: "Singles" },
-  ]
-
-  const matchedTypeData = ALBUM_TYPES_DATA.find(albumTypeData =>
-    songComment
-      ? songComment.match(albumTypeData.albumTypeRegexToSearch)
-      : albumName.match(albumTypeData.albumTypeRegexToSearch)
-  )
-  if (matchedTypeData) return matchedTypeData.albumFolderName
-  else return "Albums"
-}
-
-function getDestFolder(currentDirForm, artist, album, year, disk, track, title, ext) {
-  let dest = ""
-  const singleOrEPRegExp = / ?( |-|\(|\[) ?(ep|sing(le|el)(s|es)?(.+)?)/i
-
-  album = album.replace(singleOrEPRegExp, "") // Delete the `EP`or `Single` strings if exists in the folder name
-
-  if (!currentDirForm.hasAlbumsFolder) dest = `${musicRootFolder}\\${artist}\\${currentDirForm.folder}`
-  else if (currentDirForm.disks)
-    dest = `${musicRootFolder}\\${artist}\\${currentDirForm.folder}\\[${year}] ${album}\\CD ${disk}`
-  else if (!currentDirForm.disks) dest = `${musicRootFolder}\\${artist}\\${currentDirForm.folder}\\[${year}] ${album}`
-  return dest
-}
+const ora = require("ora")
+const spinner = ora("Scanning files").start()
 
 async function rearrange() {
-  let musicFiles = getMusicFile()
+  const allFiles = scanFiles(musicRootFolder)
 
-  let movedSuccessfully = 0
-  let errorsCount = 0
-  let hadMissingData = 0
-  let filesWErrors = []
-  let errorMessages = []
+  // backup(allFiles, spinner)
+  removeNonAudioFiles(allFiles, spinner)
 
-  // backUpAllFiles()
-  removeNonAudioFiles()
+  let musicFiles = getCertainFiles(allFiles, audioFilesFormat)
+
+  spinner.info(`Rearranging ${musicFiles.length} music files`)
+  spinner.start("Rearranging the files...")
 
   try {
     for (let [index, file] of musicFiles.entries()) {
-      let dest
-      let ext = getExtension(file)
-      let fileName = file.slice(file.lastIndexOf("\\") + 1, file.length)
+      const fileData = ({ fileName, artist, track, title, ext } = await extractFileData(file))
+      spinner.text = `${getCurrentProcessPercentage(index, musicFiles.length)}%   Moving: ${fileName}`
 
-      let metadata = await mm.parseFile(file)
-      let tags = metadata.common
-      let title = tags.title?.trim()
-      let artist = tags.albumartist?.trim()
-      let album = tags.album?.trim()
-      let year = parseInt(tags.year)
-      let comment = tags.comment
-      let track = parseInt(tags.track.no) || 1
-      if (0 < track && track < 10) track = `0${track}`
-      let albumTrackNum = parseInt(tags.track.of)
-      if (albumTrackNum && 0 < albumTrackNum && albumTrackNum < 10) albumTrackNum = `0${albumTrackNum}`
-      let disk = parseInt(tags.disk.no) || 1
-      let albumDisks = parseInt(tags.disk.of) || 1
-
-      // Setting variables to set the directory
-      let currentDirForm = { folder: null, disks: false, hasAlbumsFolder: true }
-      if (albumDisks && parseInt(albumDisks) > 1) currentDirForm.disks = true // Set whether you create a folder for the disks or not
-      if (!year || year > new Date().getFullYear() + 1 || year < 1800) year = `0000` // Set the year to `0000` if it's not suitable
-
-      process.stdout.write(`  ${getCurrentProcessPercentage(index, musicFiles.length)} %   Processing: ${fileName}\r`)
-
-      // Set The folder
-      currentDirForm.folder = getSongAlbumFolder(album, comment && comment[0])
-
-      // Determine if the file needs an album folder or not
-      if (currentDirForm.folder.match(/(No Album|Unreleased)/i)) currentDirForm.hasAlbumsFolder = false
-
-      // What to do if the data is not set
-      if (!artist || !title || !album) {
-        if (!artist) {
-          artist = `Unknown`
-          currentDirForm.folder = `No Album`
-          currentDirForm.hasAlbumsFolder = false
-        } else if (!title) title = `No Title`
-        hadMissingData++
-      }
-
-      // Optimizing the (artist, album and title) to be suitable fot a folder|file name
-      artist = optimizeFileName(artist)
-      album = optimizeFileName(album)
-      title = optimizeFileName(title)
-
-      // If it's more than one artist
-      if (artist.match(/\u0000/gi)) artist = artist.replace(/\u0000/gi, " & ")
-
-      // Sets the dest format
-      dest = getDestFolder(currentDirForm, artist, album, year, disk, track, title, ext)
-
-      let renameFileTo = `${track}. ${title}.${ext}`
+      const destFolder = setDestFolder(fileData)
+      const renameFileTo = `${track}. ${title}.${ext}`
+      const destFile = `${destFolder}\\${renameFileTo}`
 
       // Checks first if the file already is in the right path
-      if (file !== `${dest}\\${renameFileTo}`) {
-        mkDirByPathSync(`\\${dest}`) // Create all the full path if it doesn't extist
-        let existingFile = readdirSync(dest).filter(fileToCheck => fileToCheck === renameFileTo)
+      if (file !== destFile) {
+        mkDirByPathSync(`\\${destFolder}`) // Create all the full path if it doesn't exist
+        const existingFile = readdirSync(destFolder).filter(fileToCheck => fileToCheck === renameFileTo)
         if (existingFile.length > 0) renameFileTo = `${track}. ${title} - [${index}].${ext}`
-        renameSync(file, `${dest}\\${renameFileTo}`) // Move the files to their folders
+        renameSync(file, destFile) // Move the files to their folders
       }
-      movedSuccessfully++
     }
   } catch (err) {
     console.log(err)
-    errorsCount++
-    errorMessages.push(err.message)
   }
 
+  spinner.text = "Removing empty folders..."
   removeAllEmptyFolders(musicRootFolder) // Delete the empty folders
 
-  console.log(`\r
-
-    \r  Done:
-    \r    Moved ${movedSuccessfully} files
-
-    \r    Had missing data: ${hadMissingData}
-    
-    \r    Errors: ${errorsCount}
-
-  \r`)
-
-  if (filesWErrors.length > 0) {
-    console.error(`  Files with errors:\n`)
-    filesWErrors.forEach(filesWError => console.error(`    ${filesWError}\n`))
-  }
-  if (errorMessages.length > 0) {
-    console.error(`  Error:\n`)
-    errorMessages.forEach(errMsg => console.error(`    ${errMsg}\n`))
-  }
-  process.exit()
+  spinner.succeed(`Rearranged ${musicRootFolder}`)
 }
 
 module.exports = rearrange
