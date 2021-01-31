@@ -3,19 +3,16 @@ const { startDialog } = require("../utils")
 const Spotify = require("./lib/Spotify")
 const ora = require("ora")
 
-function spotifydl() {
-  startDialog({ question: `Enter Spotify link you want to download.` })
-  process.stdin.on("data", async data => {
-    console.log("\n")
-    const inputURL = data.toString().trim()
-    if (!inputURL.match(/open.spotify.com/)) return
-
-    const spinner = ora("Searching...").start()
-
-    const spotify = new Spotify(inputURL, spinner)
-
-    await spotify.download(musicRootFolder)
+async function spotifydl() {
+  const answer = await startDialog("Enter Spotify link you want to download.", {
+    validator: input => (!input.match(/open.spotify.com/) ? "Enter a valid Spotify link" : true),
   })
+
+  const spinner = ora("Searching...").start()
+  const spotify = new Spotify(answer, spinner)
+  await spotify.download(musicRootFolder)
+
+  spotifydl()
 }
 
 module.exports = spotifydl

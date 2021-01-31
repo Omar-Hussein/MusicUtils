@@ -80,8 +80,6 @@ class Spotify {
 
       console.log("")
       this.spinner.succeed(`Downloaded ${this.urlType.toLocaleLowerCase()} to ${outputDir}\n`)
-
-      startDialog({ question: "Enter Spotify link you want to download." })
     } catch (e) {
       console.log("")
       this.spinner.fail(`Error while downloading: ${e.message}\n`)
