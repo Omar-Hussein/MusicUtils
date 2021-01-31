@@ -1,7 +1,5 @@
-const { exec } = require("child_process")
 const { musicRootFolder } = require("../global")
-const { startDialog, optimizeFileName } = require("../utils")
-const logObject = require("../utils/logObject")
+const { startDialog } = require("../utils")
 const Spotify = require("./lib/Spotify")
 const ora = require("ora")
 
@@ -17,8 +15,6 @@ function spotifydl() {
     const spotify = new Spotify(inputURL, spinner)
 
     await spotify.download(musicRootFolder)
-    await require("../rearrange")()
-    process.exit()
   })
 }
 
