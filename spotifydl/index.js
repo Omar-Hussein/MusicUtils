@@ -11,8 +11,6 @@ async function spotifydl() {
   const spinner = ora("Searching...").start()
   const spotify = new Spotify(answer, spinner)
   await spotify.download(musicRootFolder)
-
-  spotifydl()
 }
 
 module.exports = spotifydl
