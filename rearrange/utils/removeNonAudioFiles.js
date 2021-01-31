@@ -1,7 +1,6 @@
 const { unlinkSync } = require("fs")
 const { audioFilesFormat } = require("../../global")
-const getCurrentProcessPercentage = require("./getCurrentProcessPercentage")
-const { getExtension } = require("../../utils")
+const { getExtension, getCurrentProcessPercentage } = require("../../utils")
 
 function removeNonAudioFiles(files, spinner) {
   const filesToRemove = files.filter(file => !getExtension(file).match(audioFilesFormat))

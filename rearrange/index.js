@@ -1,7 +1,14 @@
 const { readdirSync, renameSync } = require("fs")
 const { musicRootFolder, audioFilesFormat } = require("../global")
-const { startDialog, removeAllEmptyFolders, scanFiles, getCertainFiles, mkDirByPathSync } = require("../utils")
-const { backup, getCurrentProcessPercentage, removeNonAudioFiles, extractFileData, setDestFolder } = require("./utils")
+const {
+  startDialog,
+  getCurrentProcessPercentage,
+  removeAllEmptyFolders,
+  scanFiles,
+  getCertainFiles,
+  mkDirByPathSync,
+} = require("../utils")
+const { backup, removeNonAudioFiles, extractFileData, setDestFolder } = require("./utils")
 
 const ora = require("ora")
 

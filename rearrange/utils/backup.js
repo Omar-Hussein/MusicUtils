@@ -1,8 +1,7 @@
 const { copyFileSync } = require("fs")
 const { resolve } = require("path")
 const { musicRootFolder, backupFolder } = require("../../global")
-const getCurrentProcessPercentage = require("./getCurrentProcessPercentage")
-const { mkDirByPathSync, removeAllEmptyFolders } = require("../../utils")
+const { mkDirByPathSync, removeAllEmptyFolders, getCurrentProcessPercentage } = require("../../utils")
 
 function backup(files, spinner) {
   spinner.info(`Backing up ${files.length} files`)
