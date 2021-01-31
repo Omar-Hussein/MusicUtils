@@ -30,9 +30,11 @@ class YouTube {
       const download = ytdl(youtubeLink, { quality: "highestaudio" })
 
       download.on("progress", (_, downloaded, total) => {
-        spinner.text = `Downloading ${(downloaded / 1024 / 1024).toFixed(2)}MB of ${(total / 1024 / 1024).toFixed(
-          2
-        )}MB\n`
+        spinner.text = `Downloading ${query} (${(downloaded / 1024 / 1024).toFixed(2)}MB/${(
+          total /
+          1024 /
+          1024
+        ).toFixed(2)}MB)\n`
       })
 
       ffmpeg(download)
@@ -40,7 +42,7 @@ class YouTube {
         .save(`${output}`)
         .format("mp3")
         .on("end", () => {
-          spinner.succeed(`Download ${query} successfully.`)
+          spinner.succeed(`Downloaded ${query} successfully.`)
           resolve()
         })
     })
