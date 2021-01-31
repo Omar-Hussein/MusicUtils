@@ -1,4 +1,4 @@
-const sanitizeArtists = require("./sanitizeArtists")
+const sanitizeIfFeatured = require("./sanitizeIfFeatured")
 const getTrackDiscsAndTracksInfo = require("./getTrackDiscsAndTracksInfo")
 const sanitizeAlbum = require("./sanitizeAlbum")
 
@@ -7,13 +7,15 @@ function mapTrackMetaData(
   albumTracks,
   albumType
 ) {
+  const { artistsToDisplay, albumArtist, trackTitle, albumTitle } = sanitizeIfFeatured(artists, name, album.name)
+
   const sharedData = {
-    title: name,
-    artist: sanitizeArtists(artists),
-    "DISPLAY ARTIST": sanitizeArtists(artists),
+    title: trackTitle,
+    artist: artistsToDisplay,
+    "DISPLAY ARTIST": artistsToDisplay,
   }
 
-  const albumData = album && sanitizeAlbum(album)
+  const albumData = sanitizeAlbum(album, albumTitle, albumArtist)
 
   const { tracks, discs } = getTrackDiscsAndTracksInfo(
     albumTracks,
