@@ -3,7 +3,7 @@ const YouTube = require("./YouTube")
 const Metadata = require("./Metadata")
 const Cache = require("./Cache")
 
-const { optimizeFileName } = require("../../utils")
+const { optimizeFileName, startDialog } = require("../../utils")
 const getURLType = require("../utils/getURLType")
 
 class Spotify {
@@ -27,7 +27,7 @@ class Spotify {
   }
 
   async downloadTrack(outputDir, externalTrack) {
-    if (this.urlType === "Track") this.spinner.info(`Saving Song to: ${outputDir}`)
+    if (this.urlType === "Track") this.spinner.info(`Saving the song to ${outputDir}`)
 
     const songName = externalTrack
       ? `${externalTrack.album_artist} - ${externalTrack.title}`
@@ -39,6 +39,7 @@ class Spotify {
 
     const metadata = new Metadata(externalTrack || this.musicData, output)
     await metadata.merge(this.spinner)
+    this.spinner.stop()
   }
 
   async downloadAlbumOrPlaylist(rootOutputDir) {
@@ -49,35 +50,41 @@ class Spotify {
         : this.musicData.playlist
     )}`
 
-    this.spinner.info(`Total Songs: ${totalTracks}`)
-    this.spinner.info(`Saving ${this.urlType === "Album" ? "Album" : "Playlist"}: ${outputDir}`)
+    if (this.urlType !== "Track" && totalTracks > 1) this.spinner.info(`Total tracks: ${totalTracks}`)
+    this.spinner.info(`Saving the ${this.urlType === "Album" ? "album" : "playlist"} to ${outputDir}`)
 
     const cache = new Cache(outputDir)
     let cacheCounter = cache.read()
+    if (cacheCounter > 0) this.spinner.info("Continuing downloading from cache...")
 
     for (let i = cacheCounter; i < totalTracks; i++) {
       await this.downloadTrack(outputDir, this.musicData.tracks[i])
       cache.write(++cacheCounter)
+      if (this.urlType !== "Track" && totalTracks > 1) {
+        this.spinner.info(`Downloaded ${cacheCounter}/${totalTracks} tracks.`)
+        this.spinner.succeed(`Downloaded ${this.musicData.tracks[i].title}.`)
+      }
     }
   }
 
   async download(outputDir) {
     try {
-      if (this.urlType === "Artist") {
-        this.spinner.warn("To download an artist add their work to a playlist and download it.")
-        process.exit()
-      }
-      if (!this.urlType) throw new Error("Invalid URL type")
+      if (this.urlType === "Artist")
+        return this.spinner.warn("To download an artist add their work to a playlist and download it.")
+      if (!this.urlType) return this.spinner.warn("The entered URL is not valid.")
 
       await this.getMusicData()
 
-      // Download single tracks
       if (this.urlType === "Track") await this.downloadTrack(outputDir)
       else if (this.urlType.match(/Album|Playlist/)) await this.downloadAlbumOrPlaylist(outputDir)
 
-      console.log(`\nFinished.\n`)
+      console.log("")
+      this.spinner.succeed(`Downloaded ${this.urlType.toLocaleLowerCase()} to ${outputDir}\n`)
+
+      startDialog({ question: "Enter Spotify link you want to download." })
     } catch (e) {
-      console.log(`\n  ${e.message}\n`)
+      console.log("")
+      this.spinner.fail(`Error while downloading: ${e.message}\n`)
       process.exit()
     }
   }

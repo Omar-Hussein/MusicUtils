@@ -25,7 +25,8 @@ class YouTube {
 
   downloadAudio(query, output, spinner) {
     return new Promise(async (resolve, reject) => {
-      spinner.start(`Downloading ${query}...`)
+      console.log("")
+      spinner.start(`Retrieving data for ${query}...`)
       const youtubeLink = await this.getLink(query)
       const download = ytdl(youtubeLink, { quality: "highestaudio" })
 
@@ -42,7 +43,6 @@ class YouTube {
         .save(`${output}`)
         .format("mp3")
         .on("end", () => {
-          spinner.succeed(`Downloaded ${query} successfully.`)
           resolve()
         })
     })
