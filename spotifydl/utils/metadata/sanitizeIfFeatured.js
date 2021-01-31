@@ -8,7 +8,7 @@ function sanitizeIfFeatured(artists, trackTitle, albumTitle) {
 
   const artistsToDisplay = titleFeaturedArtistMatch
     ? `${sanitizeArtists(
-        artistsNames.filter(x => !titleFeaturedArtistMatch[1].match(x)),
+        artistsNames.filter(x => !titleFeaturedArtistMatch[1].includes(x)),
         true
       )} ${titleFeaturedArtistMatch[1]}`
     : sanitizedArtists
