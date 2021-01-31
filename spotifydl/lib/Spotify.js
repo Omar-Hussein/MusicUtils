@@ -1,4 +1,4 @@
-const spotifyApi = require("../spotifyApi")
+const SpotifyAPI = require("./SpotifyAPI")
 const YouTube = require("./YouTube")
 const Metadata = require("./Metadata")
 const Cache = require("./Cache")
@@ -12,17 +12,18 @@ class Spotify {
     this.urlType = getURLType(url)
     this.musicData = null
     this.spinner = spinner
+    this.spotifyApi = new SpotifyAPI()
   }
 
   async getID() {
-    let token = await spotifyApi.setup()
-    spotifyApi.setToken(token)
+    let token = await this.spotifyApi.setup()
+    this.spotifyApi.setToken(token)
     return this.url.match(/(album|track|playlist|artist)\/(\w{22})\??/)[2]
   }
 
   async getMusicData() {
     const id = await this.getID(this.url)
-    this.musicData = await spotifyApi[`extract${this.urlType}`](id)
+    this.musicData = await this.spotifyApi[`extract${this.urlType}`](id)
   }
 
   async downloadTrack(outputDir, externalTrack) {
@@ -40,7 +41,7 @@ class Spotify {
     await metadata.merge(this.spinner)
   }
 
-  async downloadAlbumAndPlaylist(rootOutputDir) {
+  async downloadAlbumOrPlaylist(rootOutputDir) {
     const totalTracks = this.musicData.total_tracks
     const outputDir = `${rootOutputDir}\\${optimizeFileName(
       this.urlType === "Album"
@@ -72,7 +73,7 @@ class Spotify {
 
       // Download single tracks
       if (this.urlType === "Track") await this.downloadTrack(outputDir)
-      else if (this.urlType.match(/Album|Playlist/)) await this.downloadAlbumAndPlaylist(outputDir)
+      else if (this.urlType.match(/Album|Playlist/)) await this.downloadAlbumOrPlaylist(outputDir)
 
       console.log(`\nFinished.\n`)
     } catch (e) {
@@ -81,4 +82,5 @@ class Spotify {
     }
   }
 }
+
 module.exports = Spotify
