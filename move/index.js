@@ -1,5 +1,5 @@
 const ora = require("ora")
-const { readdirSync, lstatSync, renameSync } = require("fs")
+const { readdirSync, lstatSync, renameSync, copyFileSync, unlinkSync } = require("fs")
 const { resolve } = require("path")
 const { mainMusicFolder, musicRootFolder } = require("../global")
 const {
@@ -48,8 +48,17 @@ async function move() {
 
     // Create the full route if it doesn't exist
     mkDirByPathSync(renameTo.replace(/(\/|\\)[^\/\\]+$/, ""))
-
-    renameSync(file, renameTo)
+    try {
+      renameSync(file, renameTo)
+    } catch (e) {
+      console.log({ e })
+      console.log({ message: e.message })
+      console.log({ code: e.code })
+      if (e.code === "EXDEV") {
+        copyFileSync(file, renameTo)
+        unlinkSync(file)
+      }
+    }
   }
 
   spinner.text = "Removing empty folders..."
