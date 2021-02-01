@@ -1,4 +1,6 @@
+require("dotenv").config()
 const { startDialog, createRootFolders } = require("./utils")
+
 const APP_FUNCTIONS = [
   { description: "Download via Spotify link", path: "./spotifydl" },
   { description: "Rearrange music files", path: "./rearrange" },
