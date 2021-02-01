@@ -48,16 +48,15 @@ async function move() {
 
     // Create the full route if it doesn't exist
     mkDirByPathSync(renameTo.replace(/(\/|\\)[^\/\\]+$/, ""))
+
     try {
       renameSync(file, renameTo)
     } catch (e) {
-      console.log({ e })
-      console.log({ message: e.message })
-      console.log({ code: e.code })
+      // Handling the error if it on Linux
       if (e.code === "EXDEV") {
         copyFileSync(file, renameTo)
         unlinkSync(file)
-      }
+      } else throw new Error(e.message)
     }
   }
 
