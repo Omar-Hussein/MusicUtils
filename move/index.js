@@ -1,5 +1,6 @@
 const ora = require("ora")
 const { readdirSync, lstatSync, renameSync } = require("fs")
+const { resolve } = require("path")
 const { mainMusicFolder, musicRootFolder } = require("../global")
 const {
   startDialog,
@@ -14,7 +15,7 @@ async function move() {
   const foldersToChooseFrom = [
     mainMusicFolder,
     ...scannedMainMusicDir
-      .map(x => `${mainMusicFolder}\\${x}`)
+      .map(x => resolve(mainMusicFolder, x))
       .filter(x => lstatSync(x).isDirectory() && !x.match("Apps")),
   ]
 

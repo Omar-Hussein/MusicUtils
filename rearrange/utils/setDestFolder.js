@@ -1,4 +1,5 @@
 const getSongAlbumFolder = require("./getSongAlbumFolder")
+const { resolve } = require("path")
 const { optimizeFileName } = require("../../utils")
 const { musicRootFolder } = require("../../global")
 
@@ -31,10 +32,10 @@ function setDestFile({ title, disk, artist, album, albumDisks, comment, year }) 
   title = optimizeFileName(title)
 
   // Sets the dest format
-  if (!currentDirForm.hasAlbumsFolder) return `${musicRootFolder}\\${artist}\\${currentDirForm.folder}`
+  if (!currentDirForm.hasAlbumsFolder) return resolve(musicRootFolder, artist, currentDirForm.folder)
   if (currentDirForm.disks)
-    return `${musicRootFolder}\\${artist}\\${currentDirForm.folder}\\[${year}] ${album}\\CD ${disk}`
-  if (!currentDirForm.disks) return `${musicRootFolder}\\${artist}\\${currentDirForm.folder}\\[${year}] ${album}`
+    return resolve(musicRootFolder, artist, currentDirForm.folder, `[${year}] ${album}`, `CD ${disk}`)
+  if (!currentDirForm.disks) return resolve(musicRootFolder, artist, currentDirForm.folder, `[${year}] ${album}`)
 }
 
 module.exports = setDestFile

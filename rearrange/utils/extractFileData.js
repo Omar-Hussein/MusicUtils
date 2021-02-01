@@ -9,7 +9,7 @@ async function getMetadata(file) {
 
   return {
     ext: getExtension(file),
-    fileName: file.slice(file.lastIndexOf("\\") + 1, file.length),
+    fileName: file.match(/(\/|\\)([^\/\\]+)$/)[2],
     title: tags.title?.trim(),
     artist: tags.albumartist?.trim(),
     album: tags.album?.trim(),

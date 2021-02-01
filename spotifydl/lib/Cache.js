@@ -1,10 +1,11 @@
 const { existsSync, writeFileSync, unlinkSync, mkdirSync, readFileSync } = require("fs")
+const { resolve } = require("path")
 
 class Cache {
   constructor(dir) {
     this.filename = ".cache"
     this.dir = dir
-    this.file = `${this.dir}\\${this.filename}`
+    this.file = resolve(this.dir, this.filename)
   }
 
   read() {

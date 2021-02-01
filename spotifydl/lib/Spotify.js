@@ -1,3 +1,5 @@
+const { resolve } = require("path")
+
 const SpotifyAPI = require("./SpotifyAPI")
 const YouTube = require("./YouTube")
 const Metadata = require("./Metadata")
@@ -32,7 +34,7 @@ class Spotify {
     const songName = externalTrack
       ? `${externalTrack.album_artist} - ${externalTrack.title}`
       : `${this.musicData.album_artist} - ${this.musicData.title}`
-    const output = `${outputDir}\\${optimizeFileName(songName)}.mp3`
+    const output = resolve(outputDir, `${optimizeFileName(songName)}.mp3`)
 
     const youtube = new YouTube()
     await youtube.downloadAudio(songName, output, this.spinner)
@@ -44,11 +46,14 @@ class Spotify {
 
   async downloadAlbumOrPlaylist(rootOutputDir) {
     const totalTracks = this.musicData.total_tracks
-    const outputDir = `${rootOutputDir}\\${optimizeFileName(
-      this.urlType === "Album"
-        ? `${this.musicData.tracks[0].album_artist} - ${this.musicData.tracks[0].album}`
-        : this.musicData.playlist
-    )}`
+    const outputDir = resolve(
+      rootOutputDir,
+      optimizeFileName(
+        this.urlType === "Album"
+          ? `${this.musicData.tracks[0].album_artist} - ${this.musicData.tracks[0].album}`
+          : this.musicData.playlist
+      )
+    )
 
     if (this.urlType !== "Track" && totalTracks > 1) this.spinner.info(`Total tracks: ${totalTracks}`)
     this.spinner.info(`Saving the ${this.urlType === "Album" ? "album" : "playlist"} to ${outputDir}`)

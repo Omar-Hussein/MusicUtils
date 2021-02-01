@@ -1,4 +1,5 @@
-const { readdirSync, renameSync } = require("fs")
+const { renameSync } = require("fs")
+const { resolve } = require("path")
 const { musicRootFolder, audioFilesFormat } = require("../global")
 const {
   startDialog,
@@ -36,11 +37,11 @@ async function rearrange() {
 
       const destFolder = setDestFolder(fileData)
       const renameFileTo = optimizeFileName(`${track}. ${title}.${ext}`)
-      const destFile = `${destFolder}\\${renameFileTo}`
+      const destFile = resolve(destFolder, renameFileTo)
 
       // Checks first if the file already is in the right path
       if (file !== destFile) {
-        mkDirByPathSync(`\\${destFolder}`) // Create all the full path if it doesn't exist
+        mkDirByPathSync(destFolder) // Create all the full path if it doesn't exist
         renameSync(file, destFile) // Move the files to their folders
       }
     }
@@ -53,6 +54,7 @@ async function rearrange() {
 
     spinner.succeed(`Rearranged ${musicRootFolder}\n`)
   } catch (err) {
+    console.log(err)
     spinner.fail(`${err.message}\n`)
   }
 }

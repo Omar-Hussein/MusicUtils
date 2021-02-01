@@ -10,8 +10,8 @@ function backup(files, spinner) {
   for (const [index, file] of files.entries()) {
     let fileRelativeToRoot = file.slice(musicRootFolder.length + 1, file.length)
     let dest = resolve(backupFolder, fileRelativeToRoot)
-    let destParentDir = dest.slice(0, dest.lastIndexOf(`\\`))
-    mkDirByPathSync(`\\${destParentDir}`) // Create the folder if it doesn't exist
+    let destParentDir = dest.replace(/(\/|\\)[^\/\\]+$/, "")
+    mkDirByPathSync(destParentDir) // Create the folder if it doesn't exist
 
     spinner.text = `${getCurrentProcessPercentage(index, files.length)}%  Backing up ${file}`
     spinner.render()

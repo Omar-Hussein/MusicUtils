@@ -1,4 +1,4 @@
-const { startDialog } = require("./utils")
+const { startDialog, createRootFolders } = require("./utils")
 const APP_FUNCTIONS = [
   { description: "Download via Spotify link", path: "./spotifydl" },
   { description: "Rearrange music files", path: "./rearrange" },
@@ -6,6 +6,8 @@ const APP_FUNCTIONS = [
 ]
 
 ;(async function main() {
+  createRootFolders()
+
   const answer = await startDialog(`What to do?`, {
     options: APP_FUNCTIONS.map(x => x.description),
   })
