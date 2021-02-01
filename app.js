@@ -1,15 +1,16 @@
 const { startDialog } = require("./utils")
 const APP_FUNCTIONS = [
-  { functionDescription: "Download via Spotify link.", functionPath: "./spotifydl" },
-  { functionDescription: "Rearrange the music files.", functionPath: "./rearrange" },
+  { description: "Download via Spotify link", path: "./spotifydl" },
+  { description: "Rearrange music files", path: "./rearrange" },
+  { description: "Move files to music folder", path: "./move" },
 ]
 
 ;(async function main() {
   const answer = await startDialog(`What to do?`, {
-    options: APP_FUNCTIONS.map(x => x.functionDescription),
+    options: APP_FUNCTIONS.map(x => x.description),
   })
-  const answerIndex = APP_FUNCTIONS.findIndex(x => x.functionDescription === answer)
-  await require(APP_FUNCTIONS[answerIndex].functionPath)()
+  const answerIndex = APP_FUNCTIONS.findIndex(x => x.description === answer)
+  await require(APP_FUNCTIONS[answerIndex].path)()
 
   main()
 })()
