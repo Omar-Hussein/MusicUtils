@@ -2,7 +2,7 @@ const getSongAlbumFolder = require("./getSongAlbumFolder")
 const { optimizeFileName } = require("../../utils")
 const { musicRootFolder } = require("../../global")
 
-function setDestFile({ title, artist, album, albumDisks, comment, year }) {
+function setDestFile({ title, disk, artist, album, albumDisks, comment, year }) {
   // Setting variables to set the directory
   const currentDirForm = {
     folder: getSongAlbumFolder(album, comment && comment[0]),
@@ -24,18 +24,13 @@ function setDestFile({ title, artist, album, albumDisks, comment, year }) {
   }
 
   // Optimizing the (artist, album and title) to be suitable fot a folder|file name
-  artist = optimizeFileName(artist)
-  album = optimizeFileName(album)
-  title = optimizeFileName(title)
-
-  // If it's more than one artist
-  artist = artist.replace(/\u0000/gi, " & ")
-
-  // Sets the dest format
   const singleOrEPRegExp = / ?( |-|\(|\[) ?(ep|sing(le|el)(s|es)?(.+)?)/i
 
-  album = album.replace(singleOrEPRegExp, "") // Delete the `EP`or `Single` strings if exists in the folder name
+  artist = optimizeFileName(artist.replace(/\u0000/gi, " & ")) // If it's more than one artist
+  album = optimizeFileName(album.replace(singleOrEPRegExp, "")) // Delete the `EP`or `Single` strings if exists in the folder name
+  title = optimizeFileName(title)
 
+  // Sets the dest format
   if (!currentDirForm.hasAlbumsFolder) return `${musicRootFolder}\\${artist}\\${currentDirForm.folder}`
   if (currentDirForm.disks)
     return `${musicRootFolder}\\${artist}\\${currentDirForm.folder}\\[${year}] ${album}\\CD ${disk}`
