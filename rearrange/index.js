@@ -7,6 +7,7 @@ const {
   scanFiles,
   getCertainFiles,
   mkDirByPathSync,
+  optimizeFileName,
 } = require("../utils")
 const { backup, removeNonAudioFiles, extractFileData, setDestFolder } = require("./utils")
 
@@ -34,26 +35,26 @@ async function rearrange() {
       spinner.text = `${getCurrentProcessPercentage(index, musicFiles.length)}%   Moving: ${fileName}`
 
       const destFolder = setDestFolder(fileData)
-      const renameFileTo = `${track}. ${title}.${ext}`
+      const renameFileTo = optimizeFileName(`${track}. ${title}.${ext}`)
       const destFile = `${destFolder}\\${renameFileTo}`
 
       // Checks first if the file already is in the right path
       if (file !== destFile) {
         mkDirByPathSync(`\\${destFolder}`) // Create all the full path if it doesn't exist
-        const existingFile = readdirSync(destFolder).filter(fileToCheck => fileToCheck === renameFileTo)
-        if (existingFile.length > 0) renameFileTo = `${track}. ${title} - [${index}].${ext}`
         renameSync(file, destFile) // Move the files to their folders
       }
     }
+
+    spinner.text = "Removing empty folders..."
+    removeAllEmptyFolders(musicRootFolder) // Delete the empty folders
+
+    // Recreate the music root folder if it got deleted
+    mkDirByPathSync(musicRootFolder)
+
+    spinner.succeed(`Rearranged ${musicRootFolder}\n`)
   } catch (err) {
-    console.log(err.message)
+    spinner.fail(`${err.message}\n`)
   }
-
-  spinner.text = "Removing empty folders..."
-  removeAllEmptyFolders(musicRootFolder) // Delete the empty folders
-
-  spinner.succeed(`Rearranged ${musicRootFolder}`)
-  console.log("")
 }
 
 module.exports = rearrange
