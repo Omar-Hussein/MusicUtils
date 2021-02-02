@@ -2,16 +2,16 @@ function getSongAlbumFolder(albumName, songComment) {
   if (!albumName && !songComment) return "No Album"
 
   const ALBUM_TYPES_DATA = [
-    { albumTypeRegexToSearch: /(live|itunes session)/i, albumFolderName: "Live" },
-    { albumTypeRegexToSearch: /demos?/i, albumFolderName: "Demos" },
-    { albumTypeRegexToSearch: /remix(es)?/i, albumFolderName: "Remixes" },
-    { albumTypeRegexToSearch: /unreleased/i, albumFolderName: "Unreleased" },
+    { albumTypeRegexToSearch: /\b(live|itunes session)\b/i, albumFolderName: "Live" },
+    { albumTypeRegexToSearch: /\bdemos?\b/i, albumFolderName: "Demos" },
+    { albumTypeRegexToSearch: /\bremix(es)?\b/i, albumFolderName: "Remixes" },
+    { albumTypeRegexToSearch: /\bunreleased\b/i, albumFolderName: "Unreleased" },
     {
-      albumTypeRegexToSearch: /(compilations|(platinum)? ?collection|best of|essential|greatests? hits|the best|mixtape)/i,
+      albumTypeRegexToSearch: /\b(compilations|(platinum)? ?collection|best of|essential|greatests? hits|the best|mixtape)\b/i,
       albumFolderName: "Compilations",
     },
-    { albumTypeRegexToSearch: /( |-)?eps?/i, albumFolderName: "EPs" },
-    { albumTypeRegexToSearch: /sing(le|el)/i, albumFolderName: "Singles" },
+    { albumTypeRegexToSearch: /\b( |-)?eps?\b/gi, albumFolderName: "EPs" },
+    { albumTypeRegexToSearch: /\bsing(le|el)\b/i, albumFolderName: "Singles" },
   ]
 
   const matchedTypeData = ALBUM_TYPES_DATA.find(albumTypeData =>
