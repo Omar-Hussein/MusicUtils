@@ -1,11 +1,12 @@
 const { musicRootFolder } = require("../global")
-const { startDialog } = require("../utils")
+const { startDialog, removeQueryFromLink } = require("../utils")
 const Spotify = require("./lib/Spotify")
 const ora = require("ora")
 
 async function spotifydl() {
   const answer = await startDialog("Enter Spotify link you want to download.", {
     validator: input => (!input.match(/open.spotify.com/) ? "Enter a valid Spotify link" : true),
+    filter: input => removeQueryFromLink(input),
   })
 
   const spinner = ora("Searching...").start()
