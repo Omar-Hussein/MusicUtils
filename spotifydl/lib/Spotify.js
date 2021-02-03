@@ -1,17 +1,18 @@
+const { existsSync, writeFileSync, unlinkSync } = require("fs")
 const { resolve } = require("path")
-
 const SpotifyAPI = require("./SpotifyAPI")
 const YouTube = require("./YouTube")
 const Metadata = require("./Metadata")
 const Cache = require("./Cache")
 
 const { optimizeFileName, startDialog } = require("../../utils")
+const { musicRootFolder } = require("../../global")
 const getURLType = require("../utils/getURLType")
 
 class Spotify {
   constructor(url, spinner) {
     this.url = url
-    this.urlType = getURLType(url)
+    this.urlType = url && getURLType(url)
     this.musicData = null
     this.spinner = spinner
     this.spotifyApi = new SpotifyAPI()
@@ -24,8 +25,22 @@ class Spotify {
   }
 
   async getMusicData() {
-    const id = await this.getID(this.url)
+    const id = await this.getID()
     this.musicData = await this.spotifyApi[`extract${this.urlType}`](id)
+  }
+
+  async setNewURL(url) {
+    this.url = url
+    this.urlType = getURLType(this.url)
+    this.musicData = await this.getMusicData()
+  }
+
+  updateArraysFile(filePath, linksArray, urlIndex, isDownloadedValue = true) {
+    linksArray[urlIndex].isDownloaded = isDownloadedValue
+
+    const mutatedObject = { urls: linksArray }
+    unlinkSync(filePath)
+    writeFileSync(filePath, String(JSON.stringify(mutatedObject, null, "  ")))
   }
 
   async downloadTrack(outputDir, externalTrack) {
@@ -72,7 +87,41 @@ class Spotify {
     }
   }
 
-  async download(outputDir) {
+  async downloadURLsArray(linksFilePath, outputDir) {
+    try {
+      if (!existsSync(linksFilePath)) throw new Error("This file can't be found")
+
+      const links = require(linksFilePath)?.urls
+      if (!Array.isArray(links)) throw new Error("The urls has to be an array of objects.")
+
+      const linksCount = links.length
+      if (linksCount === 0) throw new Error("There's no links in the array to download!")
+
+      const linksToDownload = links.filter(linkInfo => !linkInfo.isDownloaded)
+      const linksToDownloadCount = linksToDownload.length
+
+      if (linksToDownloadCount === 0) throw new Error("All the links in the array is downloaded!")
+
+      this.spinner.info(`Processing ${linksCount} urls`)
+
+      for (const [index, linkInfo] of links.entries()) {
+        if (linkInfo.isDownloaded || !linkInfo.url) continue
+
+        this.spinner.text = `Processing link ${index + 1}/${linksCount}...`
+
+        await this.setNewURL(linkInfo.url)
+        await this.download(outputDir)
+
+        this.updateArraysFile(linksFilePath, links, index)
+        this.spinner.succeed(`Downloaded link #${index + 1}\n\n`)
+      }
+      this.spinner.succeed(`Downloaded all the links successfully\n\n`)
+    } catch (e) {
+      this.spinner.fail(e.message)
+    }
+  }
+
+  async download(outputDir = musicRootFolder) {
     try {
       if (this.urlType === "Artist")
         return this.spinner.warn("To download an artist add their work to a playlist and download it.")
