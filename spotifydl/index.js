@@ -1,4 +1,5 @@
 const { startDialog, removeQueryFromLink } = require("../utils")
+const { downloadURLsFile } = require("../global")
 const Spotify = require("./lib/Spotify")
 const ora = require("ora")
 
@@ -21,6 +22,7 @@ async function spotifydl() {
   else if (linkMethodIndex === 1)
     jsonFilePath = await startDialog("Enter the JSON file path", {
       validator: input => (!input.match(/\.json$/i) ? "Enter a valid path to a JSON file" : true),
+      defaultAnswer: downloadURLsFile,
     })
   else throw new Error("Invalid answer!")
 
