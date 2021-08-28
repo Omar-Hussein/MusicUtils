@@ -1,4 +1,6 @@
-node_modules
-.env
+node
+files
+.vscode
 
-src_files
+env
+__pycache__
