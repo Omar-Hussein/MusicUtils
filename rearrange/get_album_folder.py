@@ -14,7 +14,7 @@ ALBUM_TYPES_DATA = [
 ]
 
 
-def get_album_folder(album, comment) -> str:
+def get_album_folder(album, comment, meta_data) -> str:
     if not album and not comment:
         return "No Album"
 
@@ -30,5 +30,9 @@ def get_album_folder(album, comment) -> str:
         if result == "Albums":
             if re.search(rexp, album, flags=re.IGNORECASE):
                 result = folder
+
+        # Check if single from track numbers
+        if result == "Albums" and meta_data["track_num"] == meta_data["album_tracks_num"] == meta_data["disc_num"] == meta_data["total_discs"] == 1:
+            result = "Singles"
 
     return result

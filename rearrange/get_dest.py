@@ -6,7 +6,7 @@ from config import RUN_FOLDER
 
 
 def get_dest(meta_data):
-    album_folder = get_album_folder(meta_data["album"], meta_data["comments"])
+    album_folder = get_album_folder(meta_data["album"], meta_data["comments"], meta_data)
 
     dir_data = {
         "artist": meta_data["album_artist"],
