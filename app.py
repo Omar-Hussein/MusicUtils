@@ -1,10 +1,26 @@
-import config
 from rearrange import rearrange
+from download import download
+from utils.start_dialogue import choose
 
-rearrange()
+APP_OPTIONS = [
+    "Download via Deezer or Spotify link",
+    "Rearrange music files",
+    # "Move files to music folder"
+]
 
 
-# import glob
-# images_folder = input("Enter the images folder:\n")
-# src_files = glob.iglob(images_folder + '**/**', recursive=True)
-# images = [img for img in src_files if re.search(r"\.(png|jpe?g|jfif)$", img)]
+def main():
+    index = choose("What to do?", APP_OPTIONS)
+
+    if index == 0:
+        download()
+
+    if index == 1:
+        rearrange()
+
+    print("")
+    main()
+
+
+if __name__ == "__main__":
+    main()

@@ -4,7 +4,6 @@ import eyed3
 from halo import Halo
 from os import path
 from pathlib import Path
-# from ask import confirm
 
 from config import RUN_FOLDER, AUDIO_FILES_REG_EXP
 

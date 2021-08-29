@@ -1,6 +1,7 @@
-node
 files
 .vscode
 
 env
 __pycache__
+
+.cache_spoty_token
