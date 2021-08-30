@@ -6,10 +6,10 @@ APP_ROOT = CONFIG_LOCATION
 
 OPERATING_FOLDER = path.join(APP_ROOT, "files")
 
-RUN_FOLDER = OPERATING_FOLDER # path.join(OPERATING_FOLDER, "run")
-BACKUP_FOLDER = OPERATING_FOLDER # path.join(OPERATING_FOLDER, "backup")
+RUN_FOLDER = OPERATING_FOLDER  # path.join(OPERATING_FOLDER, "run")
+BACKUP_FOLDER = OPERATING_FOLDER  # path.join(OPERATING_FOLDER, "backup")
 
-MUSIC_LIBRARY_FOLDER = pathlib.Path("../../Music").resolve()
+MUSIC_LIBRARY_FOLDER = "E:\Music"  # pathlib.Path("../../Music").resolve()
 
 # FLAC isn't acceptable for now
 AUDIO_FILES_REG_EXP = r"\.(ac3|m4a|au|snd|pcm|mid|rmi|mp3|mp4|aif|aifc|aiff|m3u|ra|ram|ogg|vorbis|wav)$"
