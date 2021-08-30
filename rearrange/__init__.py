@@ -16,10 +16,11 @@ from rearrange.extract_meta import extract_meta
 from rearrange.get_dest import get_dest
 
 
-def rearrange():
+def rearrange(verbose=False):
     # Scanning the files
     spinner = Halo(text="Scanning the files")
-    spinner.start()
+    if verbose:
+        spinner.start()
     all_files = glob.iglob(RUN_FOLDER + "**/**", recursive=True)
     music_files = []
     non_music_files = []
@@ -30,21 +31,25 @@ def rearrange():
         elif not path.isdir(file):
             non_music_files.append(file)
 
-    spinner.info("Removing non audio files...")
+    if verbose:
+        spinner.info("Removing non audio files...")
     remove_files(non_music_files)
 
     music_files_len = len(music_files)
 
-    spinner.info(f"Rearrangin {music_files_len} music files")
-    # spinner.stop()
-
+    if verbose:
+        spinner.info(f"Rearrangin {music_files_len} music files")
     for index, file in enumerate(music_files):
+        if not verbose:
+            # Remove warn messages
+            eyed3.log.setLevel("ERROR")
         # Get metadata
         audio = eyed3.load(file)
         meta_data = extract_meta(file, audio)
 
-        spinner.start()
-        spinner.text = f"{get_percentage(index, music_files_len)} moving: {meta_data['filename']}"
+        if verbose:
+            spinner.start()
+            spinner.text = f"{get_percentage(index, music_files_len)} moving: {meta_data['filename']}"
 
         # Get destination
         dest_folder = get_dest(meta_data)
@@ -57,10 +62,13 @@ def rearrange():
             Path(file).rename(dest)
 
     # Remove empty folder
-    spinner.info("Removing empty folders...")
+    if verbose:
+        spinner.info("Removing empty folders...")
+
     remove_empty_folders(RUN_FOLDER)
 
     # Recreate the music root folder if it got deleted
     Path(RUN_FOLDER).mkdir(exist_ok=True)
 
-    spinner.succeed(f"Rearranged {RUN_FOLDER}")
+    if verbose:
+        spinner.succeed(f"Rearranged {RUN_FOLDER}")
