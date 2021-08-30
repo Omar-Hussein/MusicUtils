@@ -13,6 +13,7 @@
   "use strict";
   const BUTTON_CLASS = "download-button";
   const HIDE_CLASS = "hide";
+  const validLinkRegExp = /https:\/\/open.spotify.com\/(album|playlist|artist)\/*/;
 
   let lastUrl = location.href;
 
@@ -100,7 +101,7 @@
 
   function handleButtonVisibility() {
     const link = location.href;
-    if (link.match(/https:\/\/open.spotify.com\/album\/*/)) {
+    if (link.match(validLinkRegExp)) {
       showButton();
     } else {
       hideButton();

@@ -17,7 +17,7 @@ def start_rearrange():
 @app.route("/download")
 def start_downloading():
     link = request.args.get("link")
-    if re.match(r"https://open.spotify.com/album/*", link):
+    if re.match(r"https://open.spotify.com/(album|playlist|artist)/*", link):
         download(link)
         return "downloaded"
     else:
