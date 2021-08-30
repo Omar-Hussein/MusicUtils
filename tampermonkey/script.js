@@ -49,7 +49,7 @@
     const main = document.querySelector("main");
     const button = document.createElement("button");
     const downloadIcon = `
-      <svg viewBox="0 0 14 19" style=" position: absolute; inset: 0; margin: auto; width: 25px;">
+      <svg viewBox="0 0 14 19" style=" position: absolute; inset: 0; margin: auto; width: 18px;">
         <path fill="white" d="M14,6 L10,6 L10,0 L4,0 L4,6 L0,6 L7,13 L14,6 L14,6 Z M0,15 L0,17 L14,17 L14,15 L0,15 L0,15 Z"/>
       </svg>
     `;
