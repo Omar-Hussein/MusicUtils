@@ -2,15 +2,12 @@ import re
 import glob
 import eyed3
 from halo import Halo
-from os import path
+from os import path, remove
 from pathlib import Path
 
 from config import RUN_FOLDER, AUDIO_FILES_REG_EXP
 
-from utils.get_percentage import get_percentage
-from utils.normalize_filename import normalize_filename
-from utils.remove_files import remove_files
-from utils.remove_empty_folders import remove_empty_folders
+from utils import get_percentage, normalize_filename, remove_files, remove_empty_folders
 
 from rearrange.extract_meta import extract_meta
 from rearrange.get_dest import get_dest
@@ -40,9 +37,8 @@ def rearrange(verbose=False):
     if verbose:
         spinner.info(f"Rearrangin {music_files_len} music files")
     for index, file in enumerate(music_files):
-        if not verbose:
-            # Remove warn messages
-            eyed3.log.setLevel("ERROR")
+        # Remove warn messages
+        eyed3.log.setLevel("ERROR")
         # Get metadata
         audio = eyed3.load(file)
         meta_data = extract_meta(file, audio)
@@ -58,8 +54,12 @@ def rearrange(verbose=False):
 
         # Move on a new path
         if file != dest:
-            Path(dest_folder).mkdir(parents=True, exist_ok=True)
-            Path(file).rename(dest)
+            try:
+                Path(dest_folder).mkdir(parents=True, exist_ok=True)
+                Path(file).rename(dest)
+            except FileExistsError:
+                remove(dest)
+                Path(file).rename(dest)
 
     # Remove empty folder
     if verbose:
