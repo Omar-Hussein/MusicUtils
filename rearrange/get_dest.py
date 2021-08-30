@@ -1,12 +1,13 @@
 import re
 from os import path
 from rearrange.get_album_folder import get_album_folder
-from utils.normalize_filename import normalize_filename
+from utils import normalize_filename
 from config import RUN_FOLDER
 
 
 def get_dest(meta_data):
-    album_folder = get_album_folder(meta_data["album"], meta_data["comments"], meta_data)
+    album_folder = get_album_folder(
+        meta_data["album"], meta_data["comments"], meta_data)
 
     dir_data = {
         "artist": meta_data["album_artist"],
