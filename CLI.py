@@ -1,11 +1,12 @@
 from rearrange import rearrange
 from download import download
-from utils.start_dialogue import text, choose
+from utils import text, choose
+from move_to_lib import move
 
 APP_OPTIONS = [
     "Download via Deezer or Spotify link",
     "Rearrange music files",
-    # "Move files to music folder"
+    "Move files to music folder"
 ]
 
 
@@ -19,6 +20,10 @@ def main():
 
     if index == 1:
         rearrange(verbose=True)
+
+    if index == 2:
+        folder = text("enter folder name")
+        move(folder)
 
     print("")
     main()
