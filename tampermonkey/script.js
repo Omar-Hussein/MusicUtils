@@ -11,14 +11,34 @@
 
 (function () {
   "use strict";
+  // Styles info
   const BUTTON_CLASS = "download-button";
+  const NOTIFICATION_CLASS = "download-notification";
   const HIDE_CLASS = "hide";
+  const INFO_MODIFIER = "info";
+  const SUCCESS_MODIFIER = "success";
+  const ERROR_MODIFIER = "error";
+  const SHOW_MODIFIER = "show";
+
+  const RENDERING_TIMEOUT = 1000;
+  const NOTIFICATION_TIMEOUT = 3000;
+  const NOTIFICATION_TRANSITION_TIME = 1000;
+
+  const SPOTIFY_COLOR = "#1db954";
+
+  // Notification timeout
+  let notificationTimeout;
+  let notificationRemoveTextTimeout;
+
+  // Other
   const validLinkRegExp = /https:\/\/open.spotify.com\/(album|playlist|artist)\/*/;
 
   let lastUrl = location.href;
 
+  /* ============ Elements and styles ============ */
+  // Style
   function renderStyle() {
-    const buttonStyle = `
+    const style = `
       .${BUTTON_CLASS} {
         position: fixed;
         top: 75px;
@@ -26,12 +46,18 @@
         z-index: 100000;
         width: 55px;
         height: 55px;
-        background: #1db954;
+        background: ${SPOTIFY_COLOR};
         border-radius: 100%;
         border: none;
         cursor: pointer;
         font-size: 1.2rem;
         transition: all 33ms cubic-bezier(.3,0,0,1);
+      }
+      .${BUTTON_CLASS} svg {
+        position: absolute;
+        inset: 0;
+        margin: auto;
+        width: 17px;
       }
       .${BUTTON_CLASS}:hover {
         transform: scale(1.06);
@@ -39,9 +65,34 @@
       .${BUTTON_CLASS}.${HIDE_CLASS} {
         opacity: 0
       }
+      .${NOTIFICATION_CLASS} {
+        z-index: 100000;
+        position: fixed;
+        right: 30px;
+        bottom: -75px;
+        background: #121212;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 0.5rem;
+        opacity: 0;
+        transition: all ${NOTIFICATION_TRANSITION_TIME}ms cubic-bezier(.3,0,0,1);
+      }
+      .${NOTIFICATION_CLASS}--${SHOW_MODIFIER} {
+        bottom: 100px;
+        opacity: 1;
+      }
+      .${NOTIFICATION_CLASS}--${INFO_MODIFIER} {
+        background: #22a0dd;
+      }
+      .${NOTIFICATION_CLASS}--${ERROR_MODIFIER} {
+        background: #f23f3f;
+      }
+      .${NOTIFICATION_CLASS}--${SUCCESS_MODIFIER} {
+        background: #19c153;
+      }
     `;
     const styleElement = document.createElement("style");
-    styleElement.innerHTML = buttonStyle;
+    styleElement.innerHTML = style;
     document.head.appendChild(styleElement);
   }
 
@@ -49,7 +100,7 @@
     const main = document.querySelector("main");
     const button = document.createElement("button");
     const downloadIcon = `
-      <svg viewBox="0 0 14 19" style=" position: absolute; inset: 0; margin: auto; width: 18px;">
+      <svg viewBox="0 0 14 19">
         <path fill="white" d="M14,6 L10,6 L10,0 L4,0 L4,6 L0,6 L7,13 L14,6 L14,6 Z M0,15 L0,17 L14,17 L14,15 L0,15 L0,15 Z"/>
       </svg>
     `;
@@ -62,43 +113,7 @@
     handleButtonVisibility();
   }
 
-  async function download() {
-    try {
-      notify("Started downloading", "info");
-      const link = location.href;
-      const response = await fetch(
-        `http://localhost:5001/download?link=${link}`
-      );
-      if (!response.ok) {
-        if (response.status === 400) {
-          throw new Error(await response.text());
-        }
-        throw new Error("Something went wrong, try again later.");
-      }
-      notify(await response.text(), "success");
-    } catch (e) {
-      notify(e.message, "error");
-    }
-  }
-
-  function notify(message, type = "info") {
-    console.log(message);
-  }
-
-  function listenToLocationChange() {
-    new MutationObserver(() => {
-      const url = location.href;
-      if (url !== lastUrl) {
-        lastUrl = url;
-        onLocationChange();
-      }
-    }).observe(document, { subtree: true, childList: true });
-  }
-
-  function onLocationChange() {
-    handleButtonVisibility();
-  }
-
+  // Button visibility
   function handleButtonVisibility() {
     const link = location.href;
     if (link.match(validLinkRegExp)) {
@@ -122,6 +137,116 @@
     button.classList.add(HIDE_CLASS);
   }
 
+  // Notification //
+  function renderNotification() {
+    const main = document.querySelector("main");
+    const notificationElement = document.createElement("div");
+    notificationElement.classList.add(NOTIFICATION_CLASS);
+    notificationElement.innerText = "a messageeeee";
+    main.appendChild(notificationElement);
+  }
+
+  function notify(message, type = "info") {
+    removeNotification(false);
+    removeNotificationTimeouts();
+    const notification = getNotification();
+    notification.innerText = message;
+    notification.classList.add(
+      `${NOTIFICATION_CLASS}--${SHOW_MODIFIER}`,
+      `${NOTIFICATION_CLASS}--${getModifier(type)}`
+    );
+
+    notificationTimeout = setTimeout(removeNotification, NOTIFICATION_TIMEOUT);
+  }
+
+  function removeNotification(shouldDelay = true) {
+    const notification = getNotification();
+    notification.classList.remove(
+      `${NOTIFICATION_CLASS}--${SHOW_MODIFIER}`,
+      `${NOTIFICATION_CLASS}--${getModifier("success")}`,
+      `${NOTIFICATION_CLASS}--${getModifier("info")}`,
+      `${NOTIFICATION_CLASS}--${getModifier("error")}`
+    );
+    if (shouldDelay) {
+      notificationRemoveTextTimeout = setTimeout(
+        () => (notification.innerText = ""),
+        NOTIFICATION_TRANSITION_TIME + 50
+      );
+    } else notification.innerText = "";
+  }
+
+  function removeNotificationTimeouts() {
+    if (notificationTimeout) {
+      clearTimeout(notificationTimeout);
+      notificationTimeout = 0;
+    }
+    if (notificationRemoveTextTimeout) {
+      clearTimeout(notificationRemoveTextTimeout);
+      notificationRemoveTextTimeout = 0;
+    }
+  }
+
+  function getNotification() {
+    return document.querySelector(`.${NOTIFICATION_CLASS}`);
+  }
+
+  function getModifier(type) {
+    if (type === "info") return INFO_MODIFIER;
+    if (type === "success") return SUCCESS_MODIFIER;
+    if (type === "error") return ERROR_MODIFIER;
+  }
+
+  // Handle changing location
+  function listenToLocationChange() {
+    new MutationObserver(() => {
+      const url = location.href;
+      if (url !== lastUrl) {
+        lastUrl = url;
+        onLocationChange();
+      }
+    }).observe(document, { subtree: true, childList: true });
+  }
+
+  function onLocationChange() {
+    handleButtonVisibility();
+  }
+
+  /* ============ Downloading ============ */
+  async function download() {
+    try {
+      notify("Started downloading", "info");
+      const link = location.href;
+      const response = await fetch(
+        `http://localhost:5001/download?link=${link}`
+      );
+      if (!response.ok) {
+        if (response.status === 400) {
+          throw new Error(await response.text());
+        }
+        throw new Error("Something went wrong, try again later.");
+      }
+      notify(await response.text(), "success");
+    } catch (e) {
+      notify(e.message, "error");
+    }
+  }
+
+  // Rendering
+  function shouldRender() {
+    return !!document.querySelector("main");
+  }
+
+  function render() {
+    if (!shouldRender()) {
+      setTimeout(render, RENDERING_TIMEOUT);
+      return;
+    }
+
+    renderButton();
+    renderNotification();
+  }
+
+  // Starting the app
   listenToLocationChange();
-  setTimeout(renderButton, 2000);
+  setTimeout(render, RENDERING_TIMEOUT);
 })();
