@@ -13,18 +13,13 @@ CORS(app)
 @app.route("/rearrange")
 def start_rearrange():
     rearrange()
-    return "rearranged"
+    return "Rearranged"
 
 
 @app.route("/move/<foldername>")
-def move_to_folder(foldername="English"):
-    VALID_FOLDERS = ["English", "Arabic", "Español",
-                     "Classical Music", "Français", "Soundtracks", "Русский"]
-    if not foldername in VALID_FOLDERS:
-        return "Invalid folder name", 400
-
-    move(foldername)
-    return "moved"
+def move_to_folder():
+    move()
+    return "Moved"
 
 
 @app.route("/download")
@@ -35,4 +30,4 @@ def start_downloading():
         return "Invalid album link", 400
 
     download(link)
-    return "downloaded"
+    return "Downloaded"

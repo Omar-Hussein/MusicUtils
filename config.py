@@ -12,7 +12,7 @@ BACKUP_FOLDER = OPERATING_FOLDER  # path.join(OPERATING_FOLDER, "backup")
 MUSIC_LIBRARY_FOLDER = "E:\Music"  # pathlib.Path("../../Music").resolve()
 
 # FLAC isn't acceptable for now
-AUDIO_FILES_REG_EXP = r"\.(ac3|m4a|au|snd|pcm|mid|rmi|mp3|mp4|aif|aifc|aiff|m3u|ra|ram|ogg|vorbis|wav)$"
+AUDIO_FILES_REG_EXP = r"\.(ac3|m4a|au|snd|pcm|mid|rmi|mp3|mp4|aif|aifc|aiff|ra|ram|ogg|vorbis|wav)$"
 IMAGES_FILES_REG_EXP = r"\.(gif|jpe?g|tiff|png)$"
 
 

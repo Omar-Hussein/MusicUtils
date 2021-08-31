@@ -36,6 +36,7 @@ def rearrange(verbose=False):
 
     if verbose:
         spinner.info(f"Rearrangin {music_files_len} music files")
+
     for index, file in enumerate(music_files):
         # Remove warn messages
         eyed3.log.setLevel("ERROR")

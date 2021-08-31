@@ -1,12 +1,14 @@
 from rearrange import rearrange
 from download import download
-from utils import text, choose
+from utils import text, choose, remove_empty_folders
 from move_to_lib import move
+from config import RUN_FOLDER
 
 APP_OPTIONS = [
     "Download via Deezer or Spotify link",
     "Rearrange music files",
-    "Move files to music folder"
+    "Move files to music folder",
+    "Remove empty folders"
 ]
 
 
@@ -22,8 +24,10 @@ def main():
         rearrange(verbose=True)
 
     if index == 2:
-        folder = text("enter folder name")
-        move(folder)
+        move()
+
+    if index == 3:
+        remove_empty_folders(RUN_FOLDER)
 
     print("")
     main()
