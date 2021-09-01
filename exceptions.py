@@ -1,3 +1,9 @@
+class NoDeezerCredentials(BaseException):
+    def __init__(self):
+        self.msg = f"You have to provide email and password or an ARI token"
+        super().__init__(self.msg)
+
+
 class InvalidLink(Exception):
     def __init__(self, url):
         self.url = url
@@ -5,7 +11,7 @@ class InvalidLink(Exception):
         super().__init__(self.msg)
 
 
-class NoDeezerCredentials(BaseException):
+class NoSongProvided(Exception):
     def __init__(self):
-        self.msg = f"You have to provide email and password or an ARI token"
+        self.msg = f"You have to provide at least a song name"
         super().__init__(self.msg)

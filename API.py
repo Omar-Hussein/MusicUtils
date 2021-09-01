@@ -5,6 +5,7 @@ from flask_cors import CORS
 from rearrange import rearrange
 from download import download
 from move_to_lib import move
+from lyrics import get_lyrics
 
 app = Flask(__name__)
 CORS(app)
@@ -21,7 +22,7 @@ def start_rearrange():
     return "Rearranged"
 
 
-@app.route("/move/<foldername>")
+@app.route("/move")
 def move_to_folder():
     move()
     return "Moved"
@@ -36,3 +37,14 @@ def start_downloading():
 
     download(link)
     return "Downloaded"
+
+
+@app.route("/lyrics")
+def lyrics():
+    artist = request.args.get("artist")
+    song = request.args.get("song")
+
+    if not song:
+        return "No song name provided", 400
+
+    return get_lyrics(song, artist)
