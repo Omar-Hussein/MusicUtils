@@ -17,7 +17,8 @@ def main():
 
     parser.add_argument("action", choices=actions,
                         help="action you'd like to preform")
-    action = parser.parse_args().action
+
+    action = parser.parse_known_args()[0].action
 
     parser.add_argument(
         "--link", help="link to download (with download action)", required=action == "download")
