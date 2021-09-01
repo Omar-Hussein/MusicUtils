@@ -12,7 +12,7 @@ from lyrics import get_lyrics
 
 
 def main():
-    actions = ["download", "move", "arrange", "lyrics", "remove-empty"]
+    actions = ["download", "move", "rearrange", "lyrics", "remove-empty"]
     parser = argparse.ArgumentParser(description="Music utils app")
 
     parser.add_argument("action", choices=actions,
@@ -38,7 +38,7 @@ def main():
     if action == "move":
         move()
 
-    elif action == "arrange":
+    elif action == "rearrange":
         rearrange(verbose=verbose)
 
     elif action == "lyrics":
