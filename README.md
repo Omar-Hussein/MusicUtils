@@ -16,7 +16,7 @@ Music Utils app where you can download, get songs lyrics and rearrange music fil
 
 * ### A download script for Tampermonkey
 
-  There's a Tampermonkey script at ``/tampermonkey/script.js`` to communicate with the server from Spotify's web app.
+  There's a Tampermonkey script at ``/tampermonkey/script.js`` to communicate with the server from Spotify's web app to download tracks, playlists, albums and discographies without the need to manually call the api.
 
   ![Screen shot for the button in action](/assets/screenshot_1.png)
   The button is on the top right.
