@@ -20,12 +20,10 @@ def start_download(link, verbose=False):
             get_spotify_track(link, verbose)
         elif "artist" in link:
             spotify_helper = SpotifyHelper()
-            artist_id = search_result = re.search(r"\w{22}", link).group()
+            artist_id = re.search(r"\w{22}", link).group()
             albums_ids = spotify_helper.get_artist_albums_ids(artist_id)
             for album_id in albums_ids:
                 start_download(f"https://open.spotify.com/album/{album_id}")
-
-
 
 
 def get_deezer_album(link, verbose):

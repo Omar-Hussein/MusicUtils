@@ -10,6 +10,11 @@ app = Flask(__name__)
 CORS(app)
 
 
+@app.route("/is-online")
+def is_server_running():
+    return "Yes"
+
+
 @app.route("/rearrange")
 def start_rearrange():
     rearrange()
@@ -29,5 +34,5 @@ def start_downloading():
     if not re.match(r"https://open.spotify.com/(album|playlist|artist)/*", link):
         return "Invalid album link", 400
 
-    download(link)
+    download(link, verbose=True)
     return "Downloaded"

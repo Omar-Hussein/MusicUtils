@@ -11,10 +11,11 @@
 
 (function () {
   "use strict";
+  // Serve info
+  const PORT = 5001;
   // Styles info
   const BUTTON_CLASS = "download-button";
   const NOTIFICATION_CLASS = "download-notification";
-  const HIDE_CLASS = "hide";
   const INFO_MODIFIER = "info";
   const SUCCESS_MODIFIER = "success";
   const ERROR_MODIFIER = "error";
@@ -33,10 +34,8 @@
   // Other
   const validLinkRegExp = /https:\/\/open.spotify.com\/(album|playlist|artist)\/*/;
 
-  let lastUrl = location.href;
-
   /* ============ Elements and styles ============ */
-  // Style
+  // Style //
   function renderStyle() {
     const style = `
       .${BUTTON_CLASS} {
@@ -52,6 +51,7 @@
         cursor: pointer;
         font-size: 1.2rem;
         transition: all 33ms cubic-bezier(.3,0,0,1);
+        opacity: 0;
       }
       .${BUTTON_CLASS} svg {
         position: absolute;
@@ -62,8 +62,8 @@
       .${BUTTON_CLASS}:hover {
         transform: scale(1.06);
       }
-      .${BUTTON_CLASS}.${HIDE_CLASS} {
-        opacity: 0
+      .${BUTTON_CLASS}--${SHOW_MODIFIER} {
+        opacity: 1;
       }
       .${NOTIFICATION_CLASS} {
         z-index: 100000;
@@ -105,15 +105,14 @@
       </svg>
     `;
     button.innerHTML = downloadIcon;
-    button.setAttribute("class", BUTTON_CLASS);
+    button.classList.add(BUTTON_CLASS);
     button.onclick = download;
     renderStyle();
-
     main.appendChild(button);
     handleButtonVisibility();
   }
 
-  // Button visibility
+  // Button visibility //
   function handleButtonVisibility() {
     const link = location.href;
     if (link.match(validLinkRegExp)) {
@@ -129,12 +128,12 @@
 
   function showButton() {
     const button = getButton();
-    button.classList.remove(HIDE_CLASS);
+    button.classList.add(`${BUTTON_CLASS}--${SHOW_MODIFIER}`);
   }
 
   function hideButton() {
     const button = getButton();
-    button.classList.add(HIDE_CLASS);
+    button.classList.remove(`${BUTTON_CLASS}--${SHOW_MODIFIER}`);
   }
 
   // Notification //
@@ -142,7 +141,6 @@
     const main = document.querySelector("main");
     const notificationElement = document.createElement("div");
     notificationElement.classList.add(NOTIFICATION_CLASS);
-    notificationElement.innerText = "a messageeeee";
     main.appendChild(notificationElement);
   }
 
@@ -198,6 +196,8 @@
 
   // Handle changing location
   function listenToLocationChange() {
+    let lastUrl = location.href;
+
     new MutationObserver(() => {
       const url = location.href;
       if (url !== lastUrl) {
@@ -214,10 +214,11 @@
   /* ============ Downloading ============ */
   async function download() {
     try {
+      await checkIfServerRunning();
       notify("Started downloading", "info");
       const link = location.href;
       const response = await fetch(
-        `http://localhost:5001/download?link=${link}`
+        `http://localhost:${PORT}/download?link=${link}`
       );
       if (!response.ok) {
         if (response.status === 400) {
@@ -228,6 +229,15 @@
       notify(await response.text(), "success");
     } catch (e) {
       notify(e.message, "error");
+    }
+  }
+
+  async function checkIfServerRunning() {
+    try {
+      await fetch(`http://localhost:${PORT}/is-online`);
+      return true;
+    } catch (_e) {
+      throw new Error("You have to run the server first!");
     }
   }
 
