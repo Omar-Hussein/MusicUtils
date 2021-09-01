@@ -34,5 +34,5 @@ def start_downloading():
     if not re.match(r"https://open.spotify.com/(album|playlist|artist)/*", link):
         return "Invalid album link", 400
 
-    download(link, verbose=True)
+    download(link)
     return "Downloaded"

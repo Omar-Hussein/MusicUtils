@@ -1,10 +1,20 @@
 import re
-import deezloader
-from config import DEEZER_ARL_TOKEN, DOWNLOAD_FOLDER, DOWNLOAD_QUALITY
+
+from deezloader import Login
+from config import DEEZER_ARL_TOKEN, DEEZER_EMAIL, DEEZER_PASSWORD, DOWNLOAD_FOLDER, DOWNLOAD_QUALITY
 from download.spotify import SpotifyHelper
 
+from exceptions import NoDeezerCredentials
 
-downloa = deezloader.Login(DEEZER_ARL_TOKEN)
+
+if DEEZER_EMAIL and DEEZER_PASSWORD:
+    downloa = Login(email=DEEZER_EMAIL, password=DEEZER_PASSWORD)
+
+elif DEEZER_ARL_TOKEN:
+    downloa = Login(arl=DEEZER_ARL_TOKEN)
+
+else:
+    raise NoDeezerCredentials
 
 
 def start_download(link, verbose=False):

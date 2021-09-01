@@ -9,3 +9,5 @@ $env:FLASK_RUN_PORT = 5001
 flask run
 
 pause
+
+& ($app_location + "scripts\start-api.ps1")

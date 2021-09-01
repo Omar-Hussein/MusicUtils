@@ -1,4 +1,5 @@
-# deezloader
+# Deezloader
+
 The library lays [HERE](https://pypi.org/project/deezloader/) due DMCA takedown. IT IS A JUST FREE PROJECT, which help people poor like me to listen their favorite music. PLEASE DO NOT TAKE DOWN IT IS COMPLETLY NO PROFIT THANKS YOU A LOT
 
 This project has been created to download songs, albums or playlists with Spotify or Deezer link from Deezer.
@@ -173,7 +174,7 @@ downloa.download_playlistspo(
   recursive_download = #True or False,
   not_interface = #True or False,
   make_zip = #True or False,
-	method_save = #choose between 0, 1 or 2
+  method_save = #choose between 0, 1 or 2
 )
 ```
 

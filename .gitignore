@@ -4,4 +4,6 @@ files
 env
 __pycache__
 
+.env
+
 .cache_spoty_token

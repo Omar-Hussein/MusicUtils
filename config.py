@@ -1,5 +1,7 @@
-import pathlib
-from os import path
+from os import path, getenv
+from dotenv import load_dotenv
+
+load_dotenv()
 
 CONFIG_LOCATION = path.dirname(path.realpath(__file__))
 APP_ROOT = CONFIG_LOCATION
@@ -18,7 +20,9 @@ IMAGES_FILES_REG_EXP = r"\.(gif|jpe?g|tiff|png)$"
 
 DOWNLOAD_FOLDER_NAME = "download"
 DOWNLOAD_FOLDER = path.join(RUN_FOLDER, DOWNLOAD_FOLDER_NAME)
-DEEZER_ARL_TOKEN = "59d6a2c911cfcb2ba120775dd093e3bc72790d5eecac664d97bddae97ccf1aa38d2eb62dee539744ca97c30b4e5d833f7e4128a17b6da8350aa8a127764526f778b360ff963c035fdc33f2d35094925a38c0fb78e9f014684cea0c173f97d74c"
+DEEZER_ARL_TOKEN = getenv("DEEZER_ARI_TOKEN")
+DEEZER_EMAIL = getenv("DEEZER_EMAIL")
+DEEZER_PASSWORD = getenv("DEEZER_PASSWORD")
 DOWNLOAD_QUALITY = "MP3_320"
 
 
