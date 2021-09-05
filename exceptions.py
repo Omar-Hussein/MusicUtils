@@ -7,7 +7,14 @@ class NoDeezerCredentials(BaseException):
 class InvalidLink(Exception):
     def __init__(self, url):
         self.url = url
-        self.msg = f"Invalid Link {self.url} :("
+        self.msg = f"Invalid Link {self.url}"
+        super().__init__(self.msg)
+
+
+class InvalidQuality(Exception):
+    def __init__(self, q):
+        self.q = q
+        self.msg = f"Invalid Quality {self.q}"
         super().__init__(self.msg)
 
 

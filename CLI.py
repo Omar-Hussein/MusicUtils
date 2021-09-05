@@ -1,9 +1,7 @@
-import re
 import argparse
 
 from utils import remove_empty_folders
 from config import RUN_FOLDER
-from exceptions import InvalidLink
 
 from rearrange import rearrange
 from download import download
@@ -13,6 +11,8 @@ from lyrics import get_lyrics
 
 def main():
     actions = ["download", "move", "rearrange", "lyrics", "remove-empty"]
+    qualities = ["FLAC", "MP3_320", "MP3_128"]
+
     parser = argparse.ArgumentParser(description="Music utils app")
 
     parser.add_argument("action", choices=actions,
@@ -22,6 +22,10 @@ def main():
 
     parser.add_argument(
         "--link", help="link to download (with download action)", required=action == "download")
+    parser.add_argument(
+        "--quality", help="download quality (with download action)", choices=qualities)
+    parser.add_argument(
+        "--rearrange", help="should rearrange after downloading or not (with download action)", action=argparse.BooleanOptionalAction, default=True)
 
     parser.add_argument(
         "--song", help="link to download (with lyrics action)", required=action == "lyrics")
@@ -50,10 +54,10 @@ def main():
 
     elif action == "download":
         link = args.link
-
-        if not re.match(r"https://open.spotify.com/(album|playlist|artist)/*", link):
-            raise InvalidLink(link)
-        download(link, verbose=verbose)
+        quality = args.quality or "MP3_320"
+        should_rearrange = args.rearrange
+        download(link, verbose=verbose, quality=quality,
+                 should_rearrange=should_rearrange)
 
     elif action == "remove-empty":
         remove_empty_folders(RUN_FOLDER)

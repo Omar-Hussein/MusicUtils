@@ -34,12 +34,7 @@ def move_to_folder():
 @app.route("/download")
 def start_downloading():
     link = request.args.get("link")
-
-    if not re.match(r"https://open.spotify.com/(album|playlist|artist)/*", link):
-        return "Invalid album link", 400
-
-    download(link)
-    return "Downloaded"
+    return download(link, for_api=True)
 
 
 @app.route("/lyrics")
