@@ -6,4 +6,4 @@ __pycache__
 
 .env
 
-.cache_spoty_token
+.cache_spoty_token*

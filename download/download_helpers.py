@@ -1,6 +1,6 @@
 import re
 
-from deezloader import Login
+from deezloader.deezloader import DeeLogin
 from config import DEEZER_ARL_TOKEN, DEEZER_EMAIL, DEEZER_PASSWORD, DOWNLOAD_FOLDER
 from download.spotify import SpotifyHelper
 
@@ -8,11 +8,7 @@ from exceptions import NoDeezerCredentials
 
 
 if DEEZER_EMAIL and DEEZER_PASSWORD:
-    downloa = Login(email=DEEZER_EMAIL, password=DEEZER_PASSWORD)
-
-elif DEEZER_ARL_TOKEN:
-    downloa = Login(arl=DEEZER_ARL_TOKEN)
-
+    downloa = DeeLogin(email=DEEZER_EMAIL, password=DEEZER_PASSWORD, arl=DEEZER_ARL_TOKEN)
 else:
     raise NoDeezerCredentials
 
