@@ -39,9 +39,9 @@
   function renderStyle() {
     const style = `
       .${BUTTON_CLASS} {
-        position: fixed;
+        position: sticky;
         top: 75px;
-        right: 30px;
+        left: 85%;
         z-index: 100000;
         width: 55px;
         height: 55px;
