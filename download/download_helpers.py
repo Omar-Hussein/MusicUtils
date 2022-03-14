@@ -1,10 +1,12 @@
 import re
+from signal import raise_signal
 
 from deezloader.deezloader import DeeLogin
 from config import DEEZER_ARL_TOKEN, DEEZER_EMAIL, DEEZER_PASSWORD, DOWNLOAD_FOLDER
 from download.spotify import SpotifyHelper
 
 from exceptions import NoDeezerCredentials
+from deezloader.exceptions import QualityNotFound
 
 
 if DEEZER_EMAIL and DEEZER_PASSWORD:
@@ -14,6 +16,20 @@ else:
 
 
 def start_download(link, quality="MP3_320", verbose=False):
+    try:
+        call_proper_func(link, quality, verbose)
+
+    except QualityNotFound as e:
+        new_quality = "MP3_320" if quality == "FLAC" else "MP3_128"
+        print(f"Can't download the track in {quality} quality. Trying to download it in {new_quality}")
+        return start_download(link, new_quality, verbose)
+
+    except Exception as e:
+        raise e
+
+
+
+def call_proper_func(link, quality, verbose):
     if "deezer" in link:
         if "album" in link:
             get_deezer_album(link, verbose, quality)

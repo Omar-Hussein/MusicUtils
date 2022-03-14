@@ -21,16 +21,16 @@ def main():
     action = parser.parse_known_args()[0].action
 
     parser.add_argument(
-        "--link", help="link to download (with download action)", required=action == "download")
+        "--link", "-l", help="link to download (with download action)", required=action == "download")
     parser.add_argument(
-        "--quality", help="download quality (with download action)", choices=qualities)
+        "--quality", "-q", help="download quality (with download action)", choices=qualities)
     parser.add_argument(
-        "--rearrange", help="should rearrange after downloading or not (with download action)", action=argparse.BooleanOptionalAction, default=True)
+        "--rearrange", "-r", help="should rearrange after downloading or not (with download action)", action=argparse.BooleanOptionalAction, default=True)
 
     parser.add_argument(
-        "--song", help="link to download (with lyrics action)", required=action == "lyrics")
+        "--song", "-s", help="link to download (with lyrics action)", required=action == "lyrics")
     parser.add_argument(
-        "--artist", help="link to download (with lyrics action)")
+        "--artist", "-a", help="link to download (with lyrics action)")
 
     parser.add_argument(
         "--verbose", "-v", action=argparse.BooleanOptionalAction, default=True,
