@@ -8,15 +8,17 @@ from download.spotify import SpotifyHelper
 from exceptions import NoDeezerCredentials
 from deezloader.exceptions import QualityNotFound
 
-
-if DEEZER_EMAIL and DEEZER_PASSWORD:
-    downloa = DeeLogin(email=DEEZER_EMAIL, password=DEEZER_PASSWORD, arl=DEEZER_ARL_TOKEN)
-else:
-    raise NoDeezerCredentials
+def login():
+    if DEEZER_EMAIL and DEEZER_PASSWORD:
+        downloa = DeeLogin(email=DEEZER_EMAIL, password=DEEZER_PASSWORD, arl=DEEZER_ARL_TOKEN)
+    else:
+        raise NoDeezerCredentials
 
 
 def start_download(link, quality="MP3_320", verbose=False):
     try:
+        if not downloa:
+            login()
         call_proper_func(link, quality, verbose)
 
     except QualityNotFound as e:

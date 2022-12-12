@@ -5,10 +5,12 @@ from exceptions import NoSongProvided
 
 from lyricsgenius import Genius
 
-genius = Genius(GENIUS_TOKEN)
-
+def login():
+    genius = Genius(GENIUS_TOKEN)
 
 def get_lyrics(song, artist=None, verbose=False):
+    if not genius:
+        login()
     genius.verbose = verbose
     if not song:
         raise NoSongProvided

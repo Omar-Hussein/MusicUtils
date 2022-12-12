@@ -35,7 +35,7 @@ def rearrange(verbose=False):
     music_files_len = len(music_files)
 
     if verbose:
-        spinner.info(f"Rearrangin {music_files_len} music files")
+        spinner.info(f"Rearranging {music_files_len} music files")
 
     for index, file in enumerate(music_files):
         # Remove warn messages
